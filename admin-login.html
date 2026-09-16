@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Painel Administrativo | Dra. Waleska Paula</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="admin/css/admin-login.css">
+</head>
+<body class="login-body">
+
+  <main class="login-page">
+    <div class="login-card">
+
+      <a class="login-brand" href="/" aria-label="Voltar para o site público">
+        <img src="assets/logo-horizontal.png" alt="Logo Dra. Waleska Paula Fisioterapeuta">
+      </a>
+
+      <div class="login-head">
+        <p class="login-eyebrow">área restrita</p>
+        <h1 class="login-title">Painel Administrativo</h1>
+        <p class="login-sub">Acesse para gerenciar serviços, cadastros e duplas.</p>
+      </div>
+
+      <form class="login-form" id="loginForm" novalidate>
+        <div class="field">
+          <label class="field__label" for="email">E-mail</label>
+          <input class="input" type="email" id="email" name="email" placeholder="seu@email.com" required autocomplete="username">
+          <span class="field__error" id="email-error"></span>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="senha">Senha</label>
+          <div class="login-password">
+            <input class="input" type="password" id="senha" name="senha" placeholder="Sua senha" required autocomplete="current-password">
+            <button class="login-password__toggle" type="button" id="senhaToggle" aria-label="Mostrar senha" tabindex="-1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <span class="field__error" id="senha-error"></span>
+        </div>
+
+        <p class="form-status" id="loginStatus" role="status" aria-live="polite"></p>
+
+        <button class="btn btn--primary btn--full btn--lg" type="submit" id="loginSubmit">Entrar</button>
+      </form>
+
+      <p class="login-back">
+        <a href="/">← Voltar para o site</a>
+      </p>
+    </div>
+  </main>
+
+  <script src="admin/js/admin-login.js"></script>
+</body>
+</html>

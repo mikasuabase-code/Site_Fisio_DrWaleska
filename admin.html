@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo | Dra. Waleska Paula</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="admin/css/admin.css">
+</head>
+<body class="admin-body">
+
+  <div class="admin-shell">
+
+    <!-- Barra lateral (desktop) -->
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Menu administrativo">
+      <a class="admin-brand" href="/">
+        <img src="assets/logo-horizontal.png" alt="Dra. Waleska Paula" loading="eager">
+      </a>
+
+      <p class="admin-sidebar__label">Menu</p>
+      <nav class="admin-nav" aria-label="Navegação administrativa">
+        <a class="admin-nav__link" href="#/visao-geral" data-view="overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          Visão geral
+        </a>
+        <a class="admin-nav__link" href="#/servicos" data-view="services">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Serviços
+        </a>
+        <a class="admin-nav__link" href="#/cadastros" data-view="registrations">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Cadastros
+          <span class="admin-nav__badge" id="badgeCadastros" hidden>0</span>
+        </a>
+        <a class="admin-nav__link" href="#/lista-espera" data-view="waitlist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Lista de espera
+          <span class="admin-nav__badge admin-nav__badge--accent" id="badgeWaitlist" hidden>0</span>
+        </a>
+        <a class="admin-nav__link" href="#/duplas" data-view="duplas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-4.6-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2.5 4.4-9.5 9-9.5 9z"/></svg>
+          Duplas
+        </a>
+        <a class="admin-nav__link" href="#/configuracoes" data-view="settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Configurações
+        </a>
+      </nav>
+
+      <div class="admin-sidebar__footer">
+        <a class="admin-nav__link admin-nav__link--logout" href="/" data-logout>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          Sair
+        </a>
+      </div>
+    </aside>
+
+    <!-- Overlay do menu mobile -->
+    <div class="admin-overlay" id="adminOverlay" aria-hidden="true"></div>
+
+    <!-- Conteúdo principal -->
+    <div class="admin-main">
+
+      <header class="admin-topbar">
+        <button class="admin-topbar__toggle" id="adminMenuToggle" aria-label="Abrir menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <div class="admin-topbar__title">
+          <h1 class="admin-topbar__h1" id="pageTitle">Visão geral</h1>
+          <p class="admin-topbar__sub" id="pageSubtitle"></p>
+        </div>
+        <div class="admin-topbar__actions">
+          <a class="admin-topbar__link" href="/" target="_blank" rel="noopener">Ver site público</a>
+          <span class="admin-topbar__sep"></span>
+          <span class="admin-topbar__user" id="adminEmail"></span>
+        </div>
+      </header>
+
+      <main class="admin-content" id="adminContent">
+
+        <!-- ============================ VISÃO GERAL ============================ -->
+        <section class="admin-view" id="view-overview" data-view-panel="overview">
+          <div class="overview-cards">
+            <div class="stat-card">
+              <span class="stat-card__icon" style="--icon-bg:hsl(145 64.3% 22% / 0.1); --icon-color:var(--primary);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </span>
+              <span class="stat-card__value" id="statTotal">0</span>
+              <span class="stat-card__label">Pessoas cadastradas</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__icon" style="--icon-bg:hsl(44.2 66.7% 52.9% / 0.18); --icon-color:hsl(145 64.3% 22%);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              </span>
+              <span class="stat-card__value" id="statAguardando">0</span>
+              <span class="stat-card__label">Aguardando atendimento</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__icon" style="--icon-bg:hsl(210 100% 25.5% / 0.1); --icon-color:var(--secondary);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 10h8M8 14h5M8 8h.01"/></svg>
+              </span>
+              <span class="stat-card__value" id="statLista">0</span>
+              <span class="stat-card__label">Na lista de espera (Pilates)</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__icon" style="--icon-bg:hsl(145 64.3% 22% / 0.1); --icon-color:var(--primary);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-4.6-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2.5 4.4-9.5 9-9.5 9z"/></svg>
+              </span>
+              <span class="stat-card__value" id="statDuplas">0</span>
+              <span class="stat-card__label">Duplas criadas</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__icon" style="--icon-bg:hsl(44.2 66.7% 52.9% / 0.18); --icon-color:hsl(145 64.3% 22%);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              </span>
+              <span class="stat-card__value" id="statServicos">0</span>
+              <span class="stat-card__label">Serviços ativos</span>
+            </div>
+          </div>
+
+          <div class="overview-actions">
+            <a class="btn btn--primary" href="#/cadastros">Ver cadastros</a>
+            <a class="btn btn--accent" href="#/lista-espera">Ver lista de espera</a>
+          </div>
+        </section>
+
+        <!-- ============================ SERVIÇOS ============================ -->
+        <section class="admin-view" id="view-services" data-view-panel="services" hidden>
+          <div class="admin-toolbar">
+            <div class="admin-toolbar__left">
+              <button class="btn btn--primary btn--sm" id="btnNewService">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" class="icon"><path d="M12 5v14M5 12h14"/></svg>
+                Criar serviço
+              </button>
+            </div>
+            <p class="admin-toolbar__hint" id="servicesHint"></p>
+          </div>
+          <div class="admin-card">
+            <div class="table-wrap">
+              <table class="admin-table" id="servicesTable">
+                <thead>
+                  <tr>
+                    <th>Serviço</th>
+                    <th>Valor</th>
+                    <th class="hide-sm">Lista de espera</th>
+                    <th>Status</th>
+                    <th class="th-actions">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="servicesTableBody"></tbody>
+              </table>
+              <div class="empty-state" id="servicesEmpty" hidden>
+                <p>Nenhum serviço cadastrado.</p>
+                <button class="btn btn--primary btn--sm" id="btnNewServiceEmpty">Criar serviço</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================ CADASTROS ============================ -->
+        <section class="admin-view" id="view-registrations" data-view-panel="registrations" hidden>
+          <div class="admin-toolbar">
+            <div class="admin-filters">
+              <div class="admin-filters__search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input class="admin-input" type="text" id="regSearch" placeholder="Buscar por nome ou telefone">
+              </div>
+              <select class="admin-input admin-select" id="regFilterServico">
+                <option value="">Todos os serviços</option>
+              </select>
+              <select class="admin-input admin-select" id="regFilterStatus">
+                <option value="">Todos os status</option>
+              </select>
+            </div>
+            <p class="admin-toolbar__hint" id="regCount"></p>
+          </div>
+          <div class="admin-card">
+            <div class="table-wrap">
+              <table class="admin-table" id="regTable">
+                <thead>
+                  <tr>
+                    <th>Pessoa</th>
+                    <th>Telefone</th>
+                    <th class="hide-sm">Serviço</th>
+                    <th class="hide-sm">Cadastro</th>
+                    <th>Status</th>
+                    <th class="th-actions">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="regTableBody"></tbody>
+              </table>
+              <div class="empty-state" id="regEmpty" hidden>
+                <p>Nenhum cadastro encontrado.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================ LISTA DE ESPERA ============================ -->
+        <section class="admin-view" id="view-waitlist" data-view-panel="waitlist" hidden>
+          <div class="admin-toolbar">
+            <div class="admin-filters">
+              <div class="admin-filters__search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input class="admin-input" type="text" id="wlSearch" placeholder="Buscar por nome ou telefone">
+              </div>
+              <select class="admin-input admin-select" id="wlFilterStatus">
+                <option value="">Todos os status</option>
+              </select>
+            </div>
+            <p class="admin-toolbar__hint" id="wlCount"></p>
+          </div>
+          <div class="admin-card">
+            <div class="table-wrap">
+              <table class="admin-table" id="wlTable">
+                <thead>
+                  <tr>
+                    <th>Pessoa</th>
+                    <th>Telefone</th>
+                    <th class="hide-sm">Inscrição</th>
+                    <th>Status</th>
+                    <th class="th-actions">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="wlTableBody"></tbody>
+              </table>
+              <div class="empty-state" id="wlEmpty" hidden>
+                <p>Nenhuma pessoa na lista de espera.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================ DUPLAS ============================ -->
+        <section class="admin-view" id="view-duplas" data-view-panel="duplas" hidden>
+          <div class="admin-toolbar">
+            <div class="admin-toolbar__left">
+              <button class="btn btn--primary btn--sm" id="btnNewDupla">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" class="icon"><path d="M12 5v14M5 12h14"/></svg>
+                Criar dupla
+              </button>
+            </div>
+            <p class="admin-toolbar__hint" id="duplasHint"></p>
+          </div>
+          <div class="duplas-grid" id="duplasGrid"></div>
+          <div class="empty-state" id="duplasEmpty" hidden>
+            <p>Nenhuma dupla criada ainda.</p>
+            <button class="btn btn--primary btn--sm" id="btnNewDuplaEmpty">Criar dupla</button>
+          </div>
+        </section>
+
+        <!-- ============================ CONFIGURAÇÕES ============================ -->
+        <section class="admin-view" id="view-settings" data-view-panel="settings" hidden>
+          <div class="admin-settings">
+            <div class="admin-card">
+              <h2 class="admin-card__title">Conta de acesso</h2>
+              <p class="admin-card__sub">Atualize o e-mail ou a senha usados para entrar no painel.</p>
+
+              <form id="settingsForm" novalidate>
+                <div class="field">
+                  <label class="field__label" for="setEmail">E-mail de acesso</label>
+                  <input class="input" type="email" id="setEmail" name="email" required>
+                  <span class="field__error" id="setEmail-error"></span>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <div class="field">
+                  <label class="field__label" for="setSenhaAtual">Senha atual</label>
+                  <input class="input" type="password" id="setSenhaAtual" name="senha_atual" placeholder="Necessária para alterar a senha" autocomplete="current-password">
+                  <span class="field__error" id="setSenhaAtual-error"></span>
+                </div>
+                <div class="field__row">
+                  <div class="field">
+                    <label class="field__label" for="setNovaSenha">Nova senha</label>
+                    <input class="input" type="password" id="setNovaSenha" name="nova_senha" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+                    <span class="field__error" id="setNovaSenha-error"></span>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="setConfirmar">Confirmar nova senha</label>
+                    <input class="input" type="password" id="setConfirmar" name="confirmar" placeholder="Repita a nova senha" autocomplete="new-password">
+                    <span class="field__error" id="setConfirmar-error"></span>
+                  </div>
+                </div>
+
+                <p class="form-status" id="settingsStatus" role="status" aria-live="polite"></p>
+
+                <button class="btn btn--primary" type="submit" id="settingsSubmit">Salvar alterações</button>
+              </form>
+            </div>
+
+            <div class="admin-card">
+              <h2 class="admin-card__title">Campos do cadastro</h2>
+              <p class="admin-card__sub">Edite as opções que aparecem no formulário de cadastro do site. Para remover, use o <code>×</code> na opção; para adicionar, digite e clique em "Adicionar".</p>
+
+              <div id="cadastroConfigEditor"></div>
+
+              <p class="form-status" id="cadastroConfigStatus" role="status" aria-live="polite"></p>
+
+              <button class="btn btn--primary" type="button" id="cadastroConfigSave">Salvar campos</button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ============================ MODAIS ============================ -->
+
+  <!-- Modal: Serviço (novo/editar) -->
+  <div class="modal" id="modalService" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal="modalService"></div>
+    <div class="modal__panel">
+      <div class="modal__head">
+        <h2 class="modal__title" id="serviceModalTitle">Novo serviço</h2>
+        <button class="modal__close" data-close-modal="modalService" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="serviceForm" novalidate>
+        <input type="hidden" id="serviceId">
+        <div class="field">
+          <label class="field__label" for="sNome">Nome do serviço</label>
+          <input class="input" type="text" id="sNome" required>
+          <span class="field__error" id="sNome-error"></span>
+        </div>
+        <div class="field">
+          <label class="field__label" for="sDescricao">Descrição</label>
+          <textarea class="input input--textarea" id="sDescricao" rows="3"></textarea>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="sValor">Valor (R$)</label>
+            <input class="input" type="number" id="sValor" step="0.01" min="0" placeholder="0,00" required>
+            <span class="field__error" id="sValor-error"></span>
+          </div>
+          <div class="field">
+            <label class="field__label" for="sIcone">Ícone</label>
+            <select class="input" id="sIcone">
+              <option value="padrao">Padrão</option>
+              <option value="pilates">Pilates</option>
+              <option value="ortopedica">Ortopédica</option>
+              <option value="rpg">RPG</option>
+              <option value="miofascial">Miofascial</option>
+              <option value="gestantes">Gestantes</option>
+              <option value="esportiva">Esportiva</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="sInfoAdicional">Informações adicionais</label>
+          <textarea class="input input--textarea" id="sInfoAdicional" rows="2" placeholder="Ex.: sessões de 50 min, condições de pacote..."></textarea>
+        </div>
+        <div class="admin-switches">
+          <label class="switch">
+            <input type="checkbox" id="sAtivo" checked>
+            <span class="switch__track"><span class="switch__thumb"></span></span>
+            <span class="switch__label">Serviço ativo no site</span>
+          </label>
+          <label class="switch">
+            <input type="checkbox" id="sListaEspera">
+            <span class="switch__track"><span class="switch__thumb"></span></span>
+            <span class="switch__label">Entra na lista de espera (Pilates)</span>
+          </label>
+        </div>
+        <p class="form-status" id="serviceStatus" role="status" aria-live="polite"></p>
+        <div class="modal__actions">
+          <button class="btn btn--outline" type="button" data-close-modal="modalService">Cancelar</button>
+          <button class="btn btn--primary" type="submit" id="serviceSubmit">Salvar serviço</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Detalhe do cadastro -->
+  <div class="modal" id="modalRegDetail" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal="modalRegDetail"></div>
+    <div class="modal__panel modal__panel--wide">
+      <div class="modal__head">
+        <h2 class="modal__title" id="regDetailTitle">Detalhes do cadastro</h2>
+        <button class="modal__close" data-close-modal="modalRegDetail" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="reg-detail" id="regDetailBody"></div>
+      <div class="modal__actions">
+        <button class="btn btn--outline" type="button" data-close-modal="modalRegDetail">Fechar</button>
+        <button class="btn btn--primary" type="button" id="btnEditReg">Editar dados</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Editar cadastro -->
+  <div class="modal" id="modalRegEdit" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal="modalRegEdit"></div>
+    <div class="modal__panel modal__panel--wide">
+      <div class="modal__head">
+        <h2 class="modal__title">Editar cadastro</h2>
+        <button class="modal__close" data-close-modal="modalRegEdit" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="regEditForm" novalidate>
+        <input type="hidden" id="regEditId">
+        <div class="field">
+          <label class="field__label" for="reNome">Nome completo</label>
+          <input class="input" type="text" id="reNome" required>
+          <span class="field__error" id="reNome-error"></span>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="reNascimento">Data de nascimento</label>
+            <input class="input" type="date" id="reNascimento">
+          </div>
+          <div class="field">
+            <label class="field__label" for="reTelefone">Telefone</label>
+            <input class="input" type="tel" id="reTelefone" required>
+            <span class="field__error" id="reTelefone-error"></span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="reStatus">Status</label>
+          <select class="input" id="reStatus"></select>
+        </div>
+        <div class="field">
+          <label class="field__label" for="reFrequencia">Frequência desejada</label>
+          <select class="input" id="reFrequencia">
+            <option value="">—</option>
+            <option>1x por semana</option>
+            <option>2x por semana</option>
+            <option>3x por semana</option>
+            <option>Mais de 3x por semana</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field__label" for="reObservacoes">Observações</label>
+          <textarea class="input input--textarea" id="reObservacoes" rows="3"></textarea>
+        </div>
+        <p class="form-status" id="regEditStatus" role="status" aria-live="polite"></p>
+        <div class="modal__actions">
+          <button class="btn btn--outline" type="button" data-close-modal="modalRegEdit">Cancelar</button>
+          <button class="btn btn--primary" type="submit">Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Lista de espera (editar) -->
+  <div class="modal" id="modalWlEdit" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal="modalWlEdit"></div>
+    <div class="modal__panel modal__panel--wide">
+      <div class="modal__head">
+        <h2 class="modal__title">Editar paciente na lista de espera</h2>
+        <button class="modal__close" data-close-modal="modalWlEdit" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="wlEditForm" novalidate>
+        <input type="hidden" id="wlEditId">
+        <div class="field">
+          <label class="field__label" for="weNome">Nome completo</label>
+          <input class="input" type="text" id="weNome" required>
+          <span class="field__error" id="weNome-error"></span>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="weNascimento">Data de nascimento</label>
+            <input class="input" type="date" id="weNascimento">
+          </div>
+          <div class="field">
+            <label class="field__label" for="weTelefone">Telefone</label>
+            <input class="input" type="tel" id="weTelefone" required>
+            <span class="field__error" id="weTelefone-error"></span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="weStatus">Status</label>
+          <select class="input" id="weStatus"></select>
+        </div>
+        <div class="field">
+          <label class="field__label" for="weDificuldades">Dificuldades ou observações</label>
+          <textarea class="input input--textarea" id="weDificuldades" rows="3"></textarea>
+        </div>
+        <p class="form-status" id="wlEditStatus" role="status" aria-live="polite"></p>
+        <div class="modal__actions">
+          <button class="btn btn--outline" type="button" data-close-modal="modalWlEdit">Cancelar</button>
+          <button class="btn btn--primary" type="submit">Salvar alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Criar dupla (seleção de pacientes) -->
+  <div class="modal" id="modalNewDupla" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal="modalNewDupla"></div>
+    <div class="modal__panel modal__panel--wide">
+      <div class="modal__head">
+        <h2 class="modal__title">Criar dupla</h2>
+        <button class="modal__close" data-close-modal="modalNewDupla" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p class="modal__sub">Selecione dois pacientes da lista de espera para formar a dupla.</p>
+      <div class="dupla-picker">
+        <div class="dupla-picker__col">
+          <h3 class="dupla-picker__title">Paciente 1</h3>
+          <div class="dupla-picker__select" id="duplaPicker1">
+            <p class="dupla-picker__empty">Escolha abaixo...</p>
+          </div>
+        </div>
+        <div class="dupla-picker__mid">
+          <span class="dupla-picker__plus">+</span>
+        </div>
+        <div class="dupla-picker__col">
+          <h3 class="dupla-picker__title">Paciente 2</h3>
+          <div class="dupla-picker__select" id="duplaPicker2">
+            <p class="dupla-picker__empty">Escolha abaixo...</p>
+          </div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:20px;">
+        <label class="field__label" for="duplaObservacoes">Observações da dupla</label>
+        <textarea class="input input--textarea" id="duplaObservacoes" rows="2" placeholder="Opcional"></textarea>
+      </div>
+      <div class="dupla-suggestion" id="duplaSuggestion" hidden></div>
+      <p class="form-status" id="duplaStatus" role="status" aria-live="polite"></p>
+      <div class="modal__actions">
+        <button class="btn btn--outline" type="button" data-close-modal="modalNewDupla">Cancelar</button>
+        <button class="btn btn--primary" type="button" id="btnConfirmDupla">Criar dupla</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmar dupla -->
+  <div class="modal" id="modalConfirmDupla" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal="modalConfirmDupla"></div>
+    <div class="modal__panel">
+      <div class="modal__head">
+        <h2 class="modal__title">Confirmar dupla</h2>
+        <button class="modal__close" data-close-modal="modalConfirmDupla" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="dupla-confirm" id="duplaConfirmBody"></div>
+      <div class="modal__actions">
+        <button class="btn btn--outline" type="button" data-close-modal="modalConfirmDupla">Cancelar</button>
+        <button class="btn btn--primary" type="button" id="btnSubmitDupla">Confirmar dupla</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Detalhe/editar dupla -->
+  <div class="modal" id="modalDuplaDetail" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal="modalDuplaDetail"></div>
+    <div class="modal__panel modal__panel--wide">
+      <div class="modal__head">
+        <h2 class="modal__title">Detalhes da dupla</h2>
+        <button class="modal__close" data-close-modal="modalDuplaDetail" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="duplaDetailForm" novalidate>
+        <input type="hidden" id="duplaDetailId">
+        <div class="dupla-detail" id="duplaDetailBody"></div>
+        <div class="field">
+          <label class="field__label" for="ddObservacoes">Observações da dupla</label>
+          <textarea class="input input--textarea" id="ddObservacoes" rows="3"></textarea>
+        </div>
+        <div class="field">
+          <label class="field__label" for="ddStatus">Status</label>
+          <select class="input" id="ddStatus">
+            <option>Em dupla</option>
+            <option>Em atendimento</option>
+            <option>Finalizado</option>
+          </select>
+        </div>
+        <p class="form-status" id="duplaDetailStatus" role="status" aria-live="polite"></p>
+        <div class="modal__actions modal__actions--between">
+          <button class="btn btn--danger" type="button" id="btnUndoDupla">Desfazer dupla</button>
+          <div>
+            <button class="btn btn--outline" type="button" data-close-modal="modalDuplaDetail">Fechar</button>
+            <button class="btn btn--primary" type="submit">Salvar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmar exclusão -->
+  <div class="modal" id="modalConfirm" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal="modalConfirm"></div>
+    <div class="modal__panel modal__panel--sm">
+      <div class="modal__head">
+        <h2 class="modal__title" id="confirmTitle">Confirmar</h2>
+        <button class="modal__close" data-close-modal="modalConfirm" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p class="modal__text" id="confirmText"></p>
+      <div class="modal__actions">
+        <button class="btn btn--outline" type="button" data-close-modal="modalConfirm">Cancelar</button>
+        <button class="btn btn--danger" type="button" id="btnConfirmAction">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="admin/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dra. Waleska Paula — Fisioterapia e Pilates</title>
+  <meta name="description" content="Fisioterapia e Pilates com acolhimento e calma. Atendimento individualizado e humanizado com a Dra. Waleska Paula, fisioterapeuta (CREFITO 356057-F).">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body id="inicio">
+
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="header" id="header">
+    <div class="container header__inner">
+      <a href="#inicio" class="header__logo" aria-label="Dra. Waleska Paula — página inicial">
+        <img src="assets/logo-horizontal.png" alt="Logo Dra. Waleska Paula Fisioterapeuta" loading="eager">
+      </a>
+
+      <nav class="header__nav" aria-label="Navegação principal">
+        <a class="header__link" href="#inicio">Início</a>
+        <a class="header__link" href="#sobre">Sobre</a>
+        <a class="header__link" href="#servicos">Serviços</a>
+        <a class="header__link" href="#cadastro">Cadastro</a>
+      </nav>
+
+      <div class="header__cta">
+        <a class="btn btn--accent btn--sm" href="#cadastro">Fazer cadastro</a>
+      </div>
+
+      <button class="header__toggle" id="navToggle" aria-expanded="false" aria-controls="drawer" aria-label="Abrir menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="drawer__backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true" aria-label="Menu">
+    <button class="drawer__close" id="drawerClose" aria-label="Fechar menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <nav class="drawer__nav" aria-label="Menu mobile">
+      <a class="drawer__link" href="#inicio">Início</a>
+      <a class="drawer__link" href="#sobre">Sobre</a>
+      <a class="drawer__link" href="#servicos">Serviços</a>
+      <a class="drawer__link" href="#cadastro">Cadastro</a>
+    </nav>
+    <div class="drawer__cta">
+      <a class="btn btn--accent btn--full" href="#cadastro">Fazer cadastro</a>
+    </div>
+  </aside>
+
+  <main id="conteudo">
+
+    <!-- ============================================================
+         HOME
+         ============================================================ -->
+    <div class="view" id="view-home">
+
+      <section class="hero-mini">
+        <span class="hero-mini__dot" aria-hidden="true"></span>
+        <div class="hero-mini__inner reveal">
+          <p class="hero-mini__eyebrow">seu corpo, seu tempo</p>
+          <h1 class="hero-mini__title">Um lugar para você se mover com calma.</h1>
+          <p class="hero-mini__text">
+            Fisioterapia e Pilates com acolhimento e presença. Atendimento
+            individualizado e humanizado para cada corpo, no ritmo que faz
+            sentido para você.
+          </p>
+          <div class="hero-mini__actions">
+            <a class="btn btn--accent btn--lg" href="#servicos">Conhecer serviços</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="presentation" id="sobre" aria-labelledby="sobre-titulo">
+        <div class="presentation__inner">
+          <div class="presentation__photo reveal">
+            <img src="assets/dra-waleska.png" alt="Dra. Waleska Paula — Fisioterapeuta (CREFITO 356057-F)" width="1024" height="1536" loading="lazy">
+          </div>
+          <div class="presentation__content reveal reveal--delay">
+            <p class="presentation__eyebrow">quem cuida de você</p>
+            <h2 class="presentation__title" id="sobre-titulo">
+              Prazer, sou a Dra. Waleska Paula, e vou <em>cuidar do seu corpo</em> com você.
+            </h2>
+            <div class="presentation__text">
+              <p>
+                Sou fisioterapeuta (CREFITO 356057-F) e atendo em consultório e a
+                domicílio. Meu trabalho é voltado à prevenção, tratamento e
+                reabilitação de lesões e dores musculoesqueléticas, usando
+                fisioterapia manual, exercícios terapêuticos e fortalecimento.
+              </p>
+              <p>
+                Ofereço um atendimento individualizado e humanizado, respeitando
+                as necessidades e objetivos de cada paciente. Meu propósito é
+                ajudar você a se movimentar melhor, cuidar da sua saúde e ter
+                mais qualidade de vida.
+              </p>
+            </div>
+            <div class="presentation__actions">
+              <a class="btn btn--primary" href="#servicos">Ver serviços e valores</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="services" id="servicos" aria-labelledby="servicos-titulo">
+        <div class="services__inner">
+          <div class="services__head reveal">
+            <p class="services__eyebrow">serviços e valores</p>
+            <h2 class="services__title" id="servicos-titulo">Como posso te ajudar</h2>
+            <p class="services__sub">
+              Escolha o serviço que faz sentido para o seu momento. Ao escolher,
+              você será levada(o) ao cadastro e eu entro em contato com você.
+            </p>
+          </div>
+
+          <div class="services__grid" id="servicesGrid">
+            <p class="services__loading" id="servicesLoading" role="status">Carregando serviços...</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta" aria-labelledby="cta-titulo">
+        <div class="cta__inner reveal">
+          <svg class="cta__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <h2 class="cta__title" id="cta-titulo">Vamos começar essa jornada juntas?</h2>
+          <p class="cta__text">
+            Escolha um serviço acima e preencha o cadastro. Eu entro em contato
+            para encontrarmos, com calma, o ritmo certo para o seu corpo.
+          </p>
+          <div class="hero-mini__actions">
+            <a class="btn btn--accent btn--lg" href="#servicos">Escolher um serviço</a>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ============================================================
+         CADASTRO
+         ============================================================ -->
+    <div class="view" id="view-cadastro" hidden>
+
+      <section class="split" id="cadastro" aria-label="Cadastro">
+
+        <div class="panel">
+          <span class="panel__ring" aria-hidden="true"></span>
+          <span class="panel__blob" aria-hidden="true"></span>
+          <span class="panel__dot panel__dot--accent" aria-hidden="true"></span>
+          <span class="panel__dot panel__dot--soft" aria-hidden="true"></span>
+
+          <a href="#inicio" class="panel__logo" aria-label="Voltar para a página inicial">
+            <img src="assets/logo-horizontal.png" alt="Logo Dra. Waleska Paula Fisioterapeuta" loading="lazy">
+          </a>
+
+          <div class="panel__body">
+            <p class="panel__eyebrow">primeiro passo</p>
+            <h2 class="panel__title">Um lugar para você <em>se mover</em> com calma.</h2>
+            <p class="panel__text">
+              Conte um pouco sobre você. A gente encontra o ritmo e a companhia
+              que fazem sentido para o seu corpo.
+            </p>
+          </div>
+
+          <div class="panel__privacy">
+            <span class="panel__privacy-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <p>
+              Seus dados ficam seguros e são usados apenas para cuidar do seu
+              atendimento.
+            </p>
+          </div>
+        </div>
+
+        <div class="form-side">
+          <div class="form-side__inner">
+
+            <div class="cadastro" id="cadastroFormWrap">
+
+              <form class="cadastro__form" id="cadastroForm" novalidate>
+                <div class="form-head">
+                  <p class="form-eyebrow">cadastro</p>
+                  <h2 class="form-title">Vamos nos conhecer?</h2>
+                </div>
+
+                <div class="service-pick">
+                  <div>
+                    <span class="service-pick__label">Serviço escolhido</span>
+                    <span class="service-pick__name" id="servicePickName">Nenhum serviço selecionado</span>
+                  </div>
+                  <a class="service-pick__change" href="#servicos">trocar</a>
+                </div>
+
+                <input type="hidden" id="servicoId" name="servico_id">
+
+                <div class="step-card" role="group" aria-labelledby="step1-titulo">
+                  <div class="step-head">
+                    <span class="step-num">01</span>
+                    <span>
+                      <span class="step-title" id="step1-titulo">Sobre você</span>
+                      <span class="step-sub">Como podemos te chamar?</span>
+                    </span>
+                  </div>
+
+                  <div class="field">
+                    <label class="field__label" for="nome">Nome completo</label>
+                    <input class="input" type="text" id="nome" name="nome" placeholder="Como podemos te chamar?" required autocomplete="name">
+                    <span class="field__error" id="nome-error"></span>
+                  </div>
+
+                  <div class="field__row">
+                    <div class="field">
+                      <label class="field__label" for="nascimento">Data de nascimento</label>
+                      <input class="input" type="date" id="nascimento" name="nascimento" required>
+                      <span class="field__error" id="nascimento-error"></span>
+                    </div>
+                    <div class="field">
+                      <label class="field__label" for="telefone">Telefone</label>
+                      <input class="input" type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" required autocomplete="tel">
+                      <span class="field__error" id="telefone-error"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="step-card" role="group" aria-labelledby="step2-titulo">
+                  <div class="step-head">
+                    <span class="step-num step-num--accent">02</span>
+                    <span>
+                      <span class="step-title" id="step2-titulo">Seu ritmo</span>
+                      <span class="step-sub">Quando você gostaria de praticar?</span>
+                    </span>
+                  </div>
+
+                  <div class="field">
+                    <span class="field__label" id="dias-label">Dias disponíveis <small>selecione quantos quiser</small></span>
+                    <div class="chips" role="group" aria-labelledby="dias-label" id="chipsDias"></div>
+                    <span class="field__error" id="dias-error"></span>
+                  </div>
+
+                  <div class="field">
+                    <span class="field__label" id="frequencia-label">Frequência desejada</span>
+                    <div class="chips" role="group" aria-labelledby="frequencia-label" id="chipsFrequencia"></div>
+                    <span class="field__error" id="frequencia-error"></span>
+                  </div>
+                </div>
+
+                <div class="step-card" role="group" aria-labelledby="step3-titulo">
+                  <div class="step-head">
+                    <span class="step-num step-num--accent">03</span>
+                    <span>
+                      <span class="step-title" id="step3-titulo">O que te trouxe?</span>
+                      <span class="step-sub">Não existe resposta certa.</span>
+                    </span>
+                  </div>
+
+                  <div class="field">
+                    <span class="field__label" id="motivos-label">Principais motivos <small>selecione quantos quiser</small></span>
+                    <div class="chips" role="group" aria-labelledby="motivos-label" id="chipsMotivos"></div>
+                    <span class="field__error" id="motivos-error"></span>
+                  </div>
+                </div>
+
+                <button class="btn btn--accent btn--full" type="submit" id="cadastroSubmit">
+                  <span class="btn__shimmer" aria-hidden="true"></span>
+                  <span>Quero começar</span>
+                </button>
+                <p class="form-status" id="cadastroStatus" role="status" aria-live="polite"></p>
+              </form>
+
+              <div class="success" id="cadastroSuccess" hidden>
+                <div class="success__card">
+                  <span class="success__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                  </span>
+                  <h3 class="success__title">Tudo certo!</h3>
+                  <p class="success__text" id="cadastroSuccessText"></p>
+                  <button class="btn btn--primary btn--full" type="button" id="cadastroReset">Fazer novo cadastro</button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <div class="footer__logo">
+          <img src="assets/logo-horizontal.png" alt="Logo Dra. Waleska Paula Fisioterapeuta" loading="lazy">
+        </div>
+        <p class="footer__tagline">
+          Seu corpo, seu tempo. Fisioterapia e Pilates com acolhimento e calma,
+          no ritmo que faz sentido para você.
+        </p>
+        <div class="footer__social">
+          <a class="footer__social-link" href="https://instagram.com/fisio_waleskapaula" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <nav class="footer__col" aria-label="Navegação">
+        <h3 class="footer__title">Navegação</h3>
+        <ul class="footer__list">
+          <li><a class="footer__link" href="#inicio">Início</a></li>
+          <li><a class="footer__link" href="#sobre">Sobre</a></li>
+          <li><a class="footer__link" href="#servicos">Serviços</a></li>
+          <li><a class="footer__link" href="#cadastro">Cadastro</a></li>
+        </ul>
+      </nav>
+
+      <nav class="footer__col" aria-label="Especialidades">
+        <h3 class="footer__title">Especialidades</h3>
+        <ul class="footer__list">
+          <li><a class="footer__link" href="#servicos">Pilates Clínico</a></li>
+          <li><a class="footer__link" href="#servicos">Fisioterapia Ortopédica</a></li>
+          <li><a class="footer__link" href="#servicos">RPG</a></li>
+          <li><a class="footer__link" href="#servicos">Liberação Miofascial</a></li>
+          <li><a class="footer__link" href="#servicos">Pilates para Gestantes</a></li>
+        </ul>
+      </nav>
+
+      <div class="footer__col">
+        <h3 class="footer__title">Contato</h3>
+        <ul class="footer__list">
+          <li class="footer__contact">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            (83) 99900-2456
+          </li>
+          <li class="footer__contact">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+            Walesca1912@hotmail.com
+          </li>
+          <li class="footer__contact">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            João Pessoa / Caaporã
+          </li>
+        </ul>
+        <p class="footer__privacy" style="margin-top:16px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>Seus dados ficam seguros e são usados apenas para o seu atendimento.</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <div class="footer__bottom-inner">
+        <p>© <span id="anoAtual"></span> Dra. Waleska Paula Fisioterapeuta. Todos os direitos reservados.</p>
+        <div class="footer__legal">
+          <span>CREFITO 356057-F</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
