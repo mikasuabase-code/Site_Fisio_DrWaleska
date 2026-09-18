@@ -8,7 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body id="inicio">
@@ -29,7 +29,8 @@
       </nav>
 
       <div class="header__cta">
-        <a class="btn btn--accent btn--sm" href="#cadastro">Fazer cadastro</a>
+        <a class="header__admin" href="/admin">Painel</a>
+        <a class="btn btn--accent btn--sm header__cadastro" href="#cadastro">Fazer cadastro</a>
       </div>
 
       <button class="header__toggle" id="navToggle" aria-expanded="false" aria-controls="drawer" aria-label="Abrir menu">
@@ -48,8 +49,10 @@
       <a class="drawer__link" href="#sobre">Sobre</a>
       <a class="drawer__link" href="#servicos">Serviços</a>
       <a class="drawer__link" href="#cadastro">Cadastro</a>
+      <a class="drawer__link" href="/admin">Painel administrativo</a>
     </nav>
     <div class="drawer__cta">
+      <a class="btn btn--outline btn--full" href="/admin">Acessar painel</a>
       <a class="btn btn--accent btn--full" href="#cadastro">Fazer cadastro</a>
     </div>
   </aside>
@@ -266,12 +269,31 @@
                   </div>
                 </div>
 
+                <div class="step-card" role="group" aria-labelledby="step4-titulo">
+                  <div class="step-head">
+                    <span class="step-num">04</span>
+                    <span>
+                      <span class="step-title" id="step4-titulo">Pagamento</span>
+                      <span class="step-sub">Como prefere quitar o atendimento?</span>
+                    </span>
+                  </div>
+                  <div class="field">
+                    <span class="field__label" id="pagamento-label">Como deseja realizar o pagamento?</span>
+                    <div class="chips" role="radiogroup" aria-labelledby="pagamento-label" id="chipsPagamento">
+                      <button type="button" class="chip" data-pagamento="Pix" aria-pressed="false">Pix</button>
+                      <button type="button" class="chip" data-pagamento="Dinheiro" aria-pressed="false">Dinheiro</button>
+                    </div>
+                    <span class="field__error" id="pagamento-error"></span>
+                  </div>
+                </div>
+
                 <button class="btn btn--accent btn--full" type="submit" id="cadastroSubmit">
                   <span class="btn__shimmer" aria-hidden="true"></span>
                   <span>Quero começar</span>
                 </button>
                 <p class="form-status" id="cadastroStatus" role="status" aria-live="polite"></p>
               </form>
+            </div>
 
               <div class="success" id="cadastroSuccess" hidden>
                 <div class="success__card">
@@ -283,8 +305,6 @@
                   <button class="btn btn--primary btn--full" type="button" id="cadastroReset">Fazer novo cadastro</button>
                 </div>
               </div>
-
-            </div>
 
           </div>
         </div>
@@ -319,6 +339,7 @@
           <li><a class="footer__link" href="#sobre">Sobre</a></li>
           <li><a class="footer__link" href="#servicos">Serviços</a></li>
           <li><a class="footer__link" href="#cadastro">Cadastro</a></li>
+          <li><a class="footer__link" href="/admin">Área administrativa</a></li>
         </ul>
       </nav>
 
@@ -361,6 +382,7 @@
         <p>© <span id="anoAtual"></span> Dra. Waleska Paula Fisioterapeuta. Todos os direitos reservados.</p>
         <div class="footer__legal">
           <span>CREFITO 356057-F</span>
+          <a class="footer__admin" href="/admin">Área administrativa</a>
         </div>
       </div>
     </div>

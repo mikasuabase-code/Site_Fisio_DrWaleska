@@ -8,7 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="admin/css/admin.css">
 </head>
@@ -18,46 +18,94 @@
 
     <!-- Barra lateral (desktop) -->
     <aside class="admin-sidebar" id="adminSidebar" aria-label="Menu administrativo">
-      <a class="admin-brand" href="/">
-        <img src="assets/logo-horizontal.png" alt="Dra. Waleska Paula" loading="eager">
-      </a>
+        <div class="admin-brand-row">
+          <a class="admin-brand" href="#/inicio">
+            <img src="assets/logo-horizontal.png" alt="Dra. Waleska Paula" loading="eager">
+          </a>
+          <button class="admin-collapse" id="adminCollapse" type="button" aria-label="Recolher menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+        </div>
 
-      <p class="admin-sidebar__label">Menu</p>
-      <nav class="admin-nav" aria-label="Navegação administrativa">
-        <a class="admin-nav__link" href="#/visao-geral" data-view="overview">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
-          Visão geral
-        </a>
-        <a class="admin-nav__link" href="#/servicos" data-view="services">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-          Serviços
-        </a>
-        <a class="admin-nav__link" href="#/cadastros" data-view="registrations">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Cadastros
-          <span class="admin-nav__badge" id="badgeCadastros" hidden>0</span>
-        </a>
-        <a class="admin-nav__link" href="#/lista-espera" data-view="waitlist">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          Lista de espera
-          <span class="admin-nav__badge admin-nav__badge--accent" id="badgeWaitlist" hidden>0</span>
-        </a>
-        <a class="admin-nav__link" href="#/duplas" data-view="duplas">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-4.6-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2.5 4.4-9.5 9-9.5 9z"/></svg>
-          Duplas
-        </a>
-        <a class="admin-nav__link" href="#/configuracoes" data-view="settings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          Configurações
-        </a>
-      </nav>
+        <p class="admin-sidebar__label">Menu</p>
+        <nav class="admin-nav" aria-label="Navegação administrativa">
+          <a class="admin-nav__link" href="#/inicio" data-view="overview" title="Início">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+            <span class="admin-nav__text">Início</span>
+          </a>
+          <a class="admin-nav__link" href="#/agenda" data-view="agenda" title="Agenda">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span class="admin-nav__text">Agenda</span>
+          </a>
+          <a class="admin-nav__link" href="#/pacientes" data-view="registrations" title="Pacientes">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span class="admin-nav__text">Pacientes</span>
+            <span class="admin-nav__badge" id="badgeCadastros" hidden>0</span>
+          </a>
+          <a class="admin-nav__link" href="#/lista-espera" data-view="waitlist" title="Lista de espera">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            <span class="admin-nav__text">Lista de espera</span>
+            <span class="admin-nav__badge admin-nav__badge--accent" id="badgeWaitlist" hidden>0</span>
+          </a>
+          <a class="admin-nav__link" href="#/duplas" data-view="duplas" title="Duplas">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-4.6-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2.5 4.4-9.5 9-9.5 9z"/></svg>
+            <span class="admin-nav__text">Duplas</span>
+          </a>
+          <a class="admin-nav__link" href="#/avaliacoes" data-view="evaluations" title="Avaliações">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+            <span class="admin-nav__text">Avaliações</span>
+          </a>
+          <a class="admin-nav__link" href="#/evolucoes" data-view="evolutions" title="Evoluções">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h6"/></svg>
+            <span class="admin-nav__text">Evoluções</span>
+          </a>
+          <a class="admin-nav__link" href="#/exercicios" data-view="exercises" title="Exercícios">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6h2v12H6zM16 6h2v12h-2zM8 11h8"/></svg>
+            <span class="admin-nav__text">Exercícios</span>
+          </a>
+          <a class="admin-nav__link" href="#/servicos" data-view="services" title="Serviços e valores">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span class="admin-nav__text">Serviços e valores</span>
+          </a>
+          <a class="admin-nav__link" href="#/financeiro" data-view="finance" title="Financeiro">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span class="admin-nav__text">Financeiro</span>
+          </a>
+          <a class="admin-nav__link" href="#/relatorios" data-view="reports" title="Relatórios">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+            <span class="admin-nav__text">Relatórios</span>
+          </a>
+          <a class="admin-nav__link" href="#/documentos" data-view="documents" title="Documentos">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            <span class="admin-nav__text">Documentos</span>
+          </a>
+          <a class="admin-nav__link" href="#/comunicacao" data-view="comms" title="Comunicação">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span class="admin-nav__text">Comunicação</span>
+          </a>
+          <a class="admin-nav__link" href="#/usuarios" data-view="users" title="Usuários">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+            <span class="admin-nav__text">Usuários</span>
+          </a>
+          <a class="admin-nav__link" href="#/configuracoes" data-view="settings" title="Configurações">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span class="admin-nav__text">Configurações</span>
+          </a>
+        </nav>
 
-      <div class="admin-sidebar__footer">
-        <a class="admin-nav__link admin-nav__link--logout" href="/" data-logout>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-          Sair
-        </a>
-      </div>
+        <div class="admin-sidebar__footer">
+          <div class="admin-user">
+            <img class="admin-user__avatar" src="assets/dra-waleska.png" alt="Waleska Paula">
+            <div class="admin-user__meta">
+              <strong id="sidebarUserName">Waleska Paula</strong>
+              <span id="sidebarUserRole">Administradora</span>
+            </div>
+          </div>
+          <a class="admin-nav__link admin-nav__link--logout" href="/" data-logout title="Sair">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+            <span class="admin-nav__text">Sair</span>
+          </a>
+        </div>
     </aside>
 
     <!-- Overlay do menu mobile -->
@@ -71,61 +119,127 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
         <div class="admin-topbar__title">
-          <h1 class="admin-topbar__h1" id="pageTitle">Visão geral</h1>
-          <p class="admin-topbar__sub" id="pageSubtitle"></p>
+          <h1 class="admin-topbar__h1" id="pageTitle">Olá, Waleska!</h1>
+          <p class="admin-topbar__sub" id="pageSubtitle">Veja o resumo da sua clínica hoje.</p>
         </div>
         <div class="admin-topbar__actions">
-          <a class="admin-topbar__link" href="/" target="_blank" rel="noopener">Ver site público</a>
-          <span class="admin-topbar__sep"></span>
-          <span class="admin-topbar__user" id="adminEmail"></span>
+          <label class="admin-search" for="globalSearch">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input class="admin-input" type="search" id="globalSearch" placeholder="Buscar paciente, agenda...">
+          </label>
+          <span class="admin-topbar__date" id="topbarDate"></span>
+          <button class="admin-bell" id="btnNotifications" type="button" aria-label="Notificações">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="admin-bell__dot" id="notifDot" hidden></span>
+          </button>
+          <a class="admin-topbar__avatar" href="#/configuracoes" title="Perfil">
+            <img src="assets/dra-waleska.png" alt="Waleska Paula">
+          </a>
         </div>
       </header>
 
       <main class="admin-content" id="adminContent">
 
-        <!-- ============================ VISÃO GERAL ============================ -->
+        <!-- ============================ INÍCIO ============================ -->
         <section class="admin-view" id="view-overview" data-view-panel="overview">
-          <div class="overview-cards">
-            <div class="stat-card">
-              <span class="stat-card__icon" style="--icon-bg:hsl(145 64.3% 22% / 0.1); --icon-color:var(--primary);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              </span>
-              <span class="stat-card__value" id="statTotal">0</span>
-              <span class="stat-card__label">Pessoas cadastradas</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-card__icon" style="--icon-bg:hsl(44.2 66.7% 52.9% / 0.18); --icon-color:hsl(145 64.3% 22%);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-              </span>
-              <span class="stat-card__value" id="statAguardando">0</span>
-              <span class="stat-card__label">Aguardando atendimento</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-card__icon" style="--icon-bg:hsl(210 100% 25.5% / 0.1); --icon-color:var(--secondary);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 10h8M8 14h5M8 8h.01"/></svg>
-              </span>
+          <div class="dash-stats">
+            <article class="stat-card">
+              <span class="stat-card__label">Pacientes ativos</span>
+              <span class="stat-card__value" id="statAtivos">0</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-card__label">Atendimentos hoje</span>
+              <span class="stat-card__value" id="statHoje">0</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-card__label">Lista de espera</span>
               <span class="stat-card__value" id="statLista">0</span>
-              <span class="stat-card__label">Na lista de espera (Pilates)</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-card__icon" style="--icon-bg:hsl(145 64.3% 22% / 0.1); --icon-color:var(--primary);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-4.6-9.5-9A5.5 5.5 0 0 1 12 6.5 5.5 5.5 0 0 1 21.5 12c-2.5 4.4-9.5 9-9.5 9z"/></svg>
-              </span>
-              <span class="stat-card__value" id="statDuplas">0</span>
-              <span class="stat-card__label">Duplas criadas</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-card__icon" style="--icon-bg:hsl(44.2 66.7% 52.9% / 0.18); --icon-color:hsl(145 64.3% 22%);">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-              </span>
-              <span class="stat-card__value" id="statServicos">0</span>
-              <span class="stat-card__label">Serviços ativos</span>
-            </div>
+            </article>
+            <article class="stat-card">
+              <span class="stat-card__label">Receita do mês</span>
+              <span class="stat-card__value" id="statReceita">R$ 0,00</span>
+            </article>
           </div>
 
-          <div class="overview-actions">
-            <a class="btn btn--primary" href="#/cadastros">Ver cadastros</a>
-            <a class="btn btn--accent" href="#/lista-espera">Ver lista de espera</a>
+          <div class="dash-grid">
+            <div class="dash-main">
+              <div class="cal-toolbar">
+                <div class="cal-toolbar__left">
+                  <button class="btn btn--primary btn--sm" id="btnNewAppointmentHome" type="button">+ Novo agendamento</button>
+                  <button class="btn btn--outline btn--sm" id="btnAgendaTodayHome" type="button">Hoje</button>
+                  <h2 class="cal-title" id="homeCalTitle">Agenda</h2>
+                </div>
+                <div class="cal-views" role="tablist" aria-label="Visualização da agenda">
+                  <button class="cal-views__btn" type="button" data-home-cal-view="day">Dia</button>
+                  <button class="cal-views__btn is-active" type="button" data-home-cal-view="week">Semana</button>
+                  <button class="cal-views__btn" type="button" data-home-cal-view="month">Mês</button>
+                </div>
+              </div>
+              <div class="admin-card cal-card">
+                <div id="homeCalBody"></div>
+              </div>
+              <div class="mobile-today" id="mobileToday" hidden>
+                <h3>Agenda de hoje</h3>
+                <div id="mobileTodayList"></div>
+              </div>
+            </div>
+            <aside class="dash-side">
+              <div class="admin-card">
+                <div class="card-head">
+                  <h3>Próximos atendimentos</h3>
+                  <a href="#/agenda">Ver todos</a>
+                </div>
+                <div id="nextAppointments"></div>
+              </div>
+              <div class="admin-card">
+                <h3>Lembretes e alertas</h3>
+                <div id="dashAlerts"></div>
+              </div>
+              <div class="admin-card">
+                <div class="card-head">
+                  <h3>Pacientes recentes</h3>
+                  <a href="#/pacientes">Ver todos</a>
+                </div>
+                <div id="recentPatients"></div>
+              </div>
+              <div class="admin-card">
+                <h3>Resumo financeiro</h3>
+                <p class="fin-line">Recebido <strong id="finRecebido">R$ 0,00</strong></p>
+                <p class="fin-line">Pendente <strong id="finPendente">R$ 0,00</strong></p>
+                <div class="fin-bar" aria-hidden="true"><span id="finBarFill"></span></div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- ============================ AGENDA ============================ -->
+        <section class="admin-view" id="view-agenda" data-view-panel="agenda" hidden>
+          <div class="cal-toolbar">
+            <div class="cal-toolbar__left">
+              <button class="btn btn--primary btn--sm" id="btnNewAppointment">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" class="icon"><path d="M12 5v14M5 12h14"/></svg>
+                Novo agendamento
+              </button>
+              <button class="btn btn--outline btn--sm" id="btnAgendaCreateReg" type="button">Cadastrar paciente</button>
+              <button class="btn btn--outline btn--sm" id="btnAgendaToday" type="button">Hoje</button>
+              <div class="cal-nav">
+                <button class="cal-nav__btn" id="btnAgendaPrev" type="button" aria-label="Período anterior">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button class="cal-nav__btn" id="btnAgendaNext" type="button" aria-label="Próximo período">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+              </div>
+              <h2 class="cal-title" id="calTitle">Agenda</h2>
+            </div>
+            <div class="cal-views" role="tablist" aria-label="Visualização da agenda">
+              <button class="cal-views__btn" type="button" data-cal-view="day">Dia</button>
+              <button class="cal-views__btn" type="button" data-cal-view="week">Semana</button>
+              <button class="cal-views__btn is-active" type="button" data-cal-view="month">Mês</button>
+            </div>
+          </div>
+          <div class="admin-card cal-card">
+            <div id="calBody"></div>
           </div>
         </section>
 
@@ -165,6 +279,13 @@
         <!-- ============================ CADASTROS ============================ -->
         <section class="admin-view" id="view-registrations" data-view-panel="registrations" hidden>
           <div class="admin-toolbar">
+            <div class="admin-toolbar__left">
+              <button class="btn btn--primary btn--sm" id="btnNewReg" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" class="icon"><path d="M12 5v14M5 12h14"/></svg>
+                Novo cadastro
+              </button>
+              <button class="btn btn--outline btn--sm" id="btnRegFromAgenda" type="button">Cadastrar da agenda</button>
+            </div>
             <div class="admin-filters">
               <div class="admin-filters__search">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -196,6 +317,7 @@
               </table>
               <div class="empty-state" id="regEmpty" hidden>
                 <p>Nenhum cadastro encontrado.</p>
+                <button class="btn btn--primary btn--sm" type="button" id="btnNewRegEmpty">Criar cadastro</button>
               </div>
             </div>
           </div>
@@ -242,16 +364,169 @@
             <div class="admin-toolbar__left">
               <button class="btn btn--primary btn--sm" id="btnNewDupla">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" class="icon"><path d="M12 5v14M5 12h14"/></svg>
-                Criar dupla
+                Formar nova dupla
               </button>
             </div>
             <p class="admin-toolbar__hint" id="duplasHint"></p>
           </div>
+          <div class="admin-card duplas-suggest-card" id="duplasSuggestCard">
+            <div class="card-head">
+              <h3>Sugestões automáticas</h3>
+              <span class="admin-toolbar__hint" id="duplasSuggestHint"></span>
+            </div>
+            <p class="admin-card__sub">O sistema compara dias, horários, objetivos, necessidades e faixa etária. Aprove a sugestão ou forme a dupla manualmente.</p>
+            <div class="duplas-suggest-grid" id="duplasSuggestGrid"></div>
+            <div class="empty-state" id="duplasSuggestEmpty" hidden>
+              <p>Nenhuma sugestão com compatibilidade suficiente no momento.</p>
+            </div>
+          </div>
+          <h3 class="duplas-section-title">Duplas formadas</h3>
           <div class="duplas-grid" id="duplasGrid"></div>
           <div class="empty-state" id="duplasEmpty" hidden>
             <p>Nenhuma dupla criada ainda.</p>
-            <button class="btn btn--primary btn--sm" id="btnNewDuplaEmpty">Criar dupla</button>
+            <button class="btn btn--primary btn--sm" id="btnNewDuplaEmpty">Formar nova dupla</button>
           </div>
+        </section>
+
+        <!-- ============================ AVALIAÇÕES ============================ -->
+        <section class="admin-view" id="view-evaluations" data-view-panel="evaluations" hidden>
+          <div class="admin-toolbar">
+            <button class="btn btn--primary btn--sm" type="button" id="btnNewEval">Nova avaliação</button>
+          </div>
+          <div class="admin-card"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Paciente</th><th>Data</th><th class="hide-sm">Queixa</th><th></th></tr></thead><tbody id="evalTableBody"></tbody></table><div class="empty-state" id="evalEmpty" hidden><p>Nenhuma avaliação registrada.</p></div></div></div>
+        </section>
+
+        <!-- ============================ EVOLUÇÕES ============================ -->
+        <section class="admin-view" id="view-evolutions" data-view-panel="evolutions" hidden>
+          <div class="admin-toolbar">
+            <button class="btn btn--primary btn--sm" type="button" id="btnNewEvo">Nova evolução</button>
+          </div>
+          <div class="admin-card"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Paciente</th><th>Data</th><th class="hide-sm">Procedimentos</th><th></th></tr></thead><tbody id="evoTableBody"></tbody></table><div class="empty-state" id="evoEmpty" hidden><p>Nenhuma evolução registrada.</p></div></div></div>
+        </section>
+
+        <!-- ============================ EXERCÍCIOS ============================ -->
+        <section class="admin-view" id="view-exercises" data-view-panel="exercises" hidden>
+          <div class="admin-toolbar">
+            <button class="btn btn--primary btn--sm" type="button" id="btnNewEx">Novo exercício</button>
+          </div>
+          <div class="admin-card"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Exercício</th><th class="hide-sm">Categoria</th><th class="hide-sm">Região</th><th></th></tr></thead><tbody id="exTableBody"></tbody></table><div class="empty-state" id="exEmpty" hidden><p>Nenhum exercício cadastrado.</p></div></div></div>
+        </section>
+
+        <!-- ============================ FINANCEIRO ============================ -->
+        <section class="admin-view" id="view-finance" data-view-panel="finance" hidden>
+          <div class="admin-toolbar">
+            <div class="admin-filters">
+              <div class="cal-views" role="tablist" aria-label="Período financeiro">
+                <button class="cal-views__btn is-active" type="button" data-pay-periodo="">Todos</button>
+                <button class="cal-views__btn" type="button" data-pay-periodo="hoje">Hoje</button>
+                <button class="cal-views__btn" type="button" data-pay-periodo="semana">Esta semana</button>
+                <button class="cal-views__btn" type="button" data-pay-periodo="mes">Este mês</button>
+              </div>
+              <input class="admin-input" type="date" id="payDe" aria-label="Data inicial">
+              <input class="admin-input" type="date" id="payAte" aria-label="Data final">
+              <input class="admin-input" type="text" id="payPaciente" placeholder="Paciente">
+              <select class="admin-input admin-select" id="payServico">
+                <option value="">Todos os serviços</option>
+              </select>
+              <select class="admin-input admin-select" id="payForma">
+                <option value="">Forma de pagamento</option>
+                <option>Pix</option>
+                <option>Dinheiro</option>
+              </select>
+              <select class="admin-input admin-select" id="payStatus">
+                <option value="">Todos os status</option>
+                <option>Pendente</option>
+                <option>Pago</option>
+                <option>Cancelado</option>
+              </select>
+            </div>
+            <button class="btn btn--primary btn--sm" type="button" id="btnNewPay">Registrar pagamento</button>
+          </div>
+          <div class="dash-stats" id="payStats" style="margin-bottom:16px">
+            <article class="stat-card"><span class="stat-card__label">Total recebido</span><span class="stat-card__value" id="payRecebido">R$ 0,00</span></article>
+            <article class="stat-card"><span class="stat-card__label">Total pendente</span><span class="stat-card__value" id="payPendente">R$ 0,00</span></article>
+            <article class="stat-card"><span class="stat-card__label">Total cancelado</span><span class="stat-card__value" id="payCancelado">R$ 0,00</span></article>
+            <article class="stat-card"><span class="stat-card__label">Total por Pix</span><span class="stat-card__value" id="payPix">R$ 0,00</span></article>
+            <article class="stat-card"><span class="stat-card__label">Total em dinheiro</span><span class="stat-card__value" id="payDinheiro">R$ 0,00</span></article>
+          </div>
+          <div class="admin-card">
+            <div class="table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Paciente</th>
+                    <th>Serviço</th>
+                    <th>Valor</th>
+                    <th>Forma</th>
+                    <th>Status</th>
+                    <th class="hide-sm">Data</th>
+                    <th class="th-actions">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="payTableBody"></tbody>
+              </table>
+              <div class="empty-state" id="payEmpty" hidden><p>Nenhum lançamento financeiro.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================ RELATÓRIOS ============================ -->
+        <section class="admin-view" id="view-reports" data-view-panel="reports" hidden>
+          <div class="admin-toolbar">
+            <div class="admin-filters">
+              <input class="admin-input" type="date" id="repDe" aria-label="Data inicial">
+              <input class="admin-input" type="date" id="repAte" aria-label="Data final">
+              <button class="btn btn--outline btn--sm" type="button" id="btnRepAtualizar">Atualizar</button>
+            </div>
+            <a class="btn btn--primary btn--sm" id="btnRepPdf" href="/api/admin/payments/relatorio" target="_blank" rel="noopener">Gerar PDF</a>
+          </div>
+          <h3 class="duplas-section-title">Pacientes</h3>
+          <div class="dash-stats" id="reportsPacientes"></div>
+          <h3 class="duplas-section-title">Atendimentos</h3>
+          <div class="dash-stats" id="reportsAgenda"></div>
+          <h3 class="duplas-section-title">Financeiro</h3>
+          <div class="dash-stats" id="reportsStats"></div>
+          <div class="admin-card" style="margin-top:16px">
+            <h2 class="admin-card__title">Lançamentos do período</h2>
+            <div class="table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Paciente</th>
+                    <th>Serviço</th>
+                    <th>Valor</th>
+                    <th>Forma</th>
+                    <th>Status</th>
+                    <th class="hide-sm">Data</th>
+                  </tr>
+                </thead>
+                <tbody id="repTableBody"></tbody>
+              </table>
+              <div class="empty-state" id="repEmpty" hidden><p>Nenhum lançamento no período.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================ DOCUMENTOS ============================ -->
+        <section class="admin-view" id="view-documents" data-view-panel="documents" hidden>
+          <div class="admin-toolbar">
+            <button class="btn btn--primary btn--sm" type="button" id="btnNewDoc">Novo documento</button>
+          </div>
+          <div class="admin-card"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Título</th><th>Paciente</th><th class="hide-sm">Tipo</th><th></th></tr></thead><tbody id="docTableBody"></tbody></table><div class="empty-state" id="docEmpty" hidden><p>Nenhum documento registrado.</p></div></div></div>
+        </section>
+
+        <!-- ============================ COMUNICAÇÃO ============================ -->
+        <section class="admin-view" id="view-comms" data-view-panel="comms" hidden>
+          <div class="admin-card">
+            <h2 class="admin-card__title">Comunicação</h2>
+            <p class="admin-card__sub">Use o WhatsApp da clínica para confirmar horários e avisar pacientes. O número fica em Configurações.</p>
+            <a class="btn btn--primary" id="commsWhatsapp" href="https://wa.me/5583999002456" target="_blank" rel="noopener">Abrir WhatsApp</a>
+          </div>
+        </section>
+
+        <!-- ============================ USUÁRIOS ============================ -->
+        <section class="admin-view" id="view-users" data-view-panel="users" hidden>
+          <div class="admin-card"><div class="table-wrap"><table class="admin-table"><thead><tr><th>Nome</th><th>E-mail</th><th>Função</th></tr></thead><tbody id="usersTableBody"></tbody></table></div></div>
         </section>
 
         <!-- ============================ CONFIGURAÇÕES ============================ -->
@@ -266,6 +541,38 @@
                   <label class="field__label" for="setEmail">E-mail de acesso</label>
                   <input class="input" type="email" id="setEmail" name="email" required>
                   <span class="field__error" id="setEmail-error"></span>
+                </div>
+
+                <div class="settings-divider"></div>
+
+                <h3 class="duplas-section-title">Dados da clínica</h3>
+                <div class="field">
+                  <label class="field__label" for="setClinicaNome">Nome</label>
+                  <input class="input" type="text" id="setClinicaNome" name="clinica_nome">
+                </div>
+                <div class="field__row">
+                  <div class="field">
+                    <label class="field__label" for="setWhatsapp">WhatsApp</label>
+                    <input class="input" type="text" id="setWhatsapp" name="whatsapp" placeholder="(83) 99900-2456">
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="setClinicaEmail">E-mail da clínica</label>
+                    <input class="input" type="email" id="setClinicaEmail" name="clinica_email">
+                  </div>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="setEndereco">Endereço</label>
+                  <input class="input" type="text" id="setEndereco" name="endereco">
+                </div>
+                <div class="field__row">
+                  <div class="field">
+                    <label class="field__label" for="setHorarios">Horários</label>
+                    <input class="input" type="text" id="setHorarios" name="horarios">
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="setCrefito">Registro profissional</label>
+                    <input class="input" type="text" id="setCrefito" name="crefito">
+                  </div>
                 </div>
 
                 <div class="settings-divider"></div>
@@ -310,6 +617,13 @@
       </main>
     </div>
   </div>
+
+  <nav class="mobile-dock" aria-label="Navegação rápida">
+    <a class="mobile-dock__link" href="#/inicio" data-view="overview">Início</a>
+    <a class="mobile-dock__link" href="#/agenda" data-view="agenda">Agenda</a>
+    <a class="mobile-dock__link" href="#/pacientes" data-view="registrations">Pacientes</a>
+    <button class="mobile-dock__link" type="button" id="btnMobileMore">Mais</button>
+  </nav>
 
   <!-- ============================ MODAIS ============================ -->
 
@@ -388,10 +702,118 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </div>
+      <div class="prontuario-tabs" role="tablist" aria-label="Prontuário do paciente">
+        <button class="prontuario-tabs__btn is-active" type="button" data-ptab="dados">Dados</button>
+        <button class="prontuario-tabs__btn" type="button" data-ptab="avaliacao">Avaliação</button>
+        <button class="prontuario-tabs__btn" type="button" data-ptab="evolucoes">Evoluções</button>
+        <button class="prontuario-tabs__btn" type="button" data-ptab="agenda">Agenda</button>
+        <button class="prontuario-tabs__btn" type="button" data-ptab="exercicios">Exercícios</button>
+        <button class="prontuario-tabs__btn" type="button" data-ptab="financeiro">Financeiro</button>
+        <button class="prontuario-tabs__btn" type="button" data-ptab="documentos">Documentos</button>
+        <button class="prontuario-tabs__btn" type="button" data-ptab="historico">Histórico</button>
+      </div>
       <div class="reg-detail" id="regDetailBody"></div>
       <div class="modal__actions">
         <button class="btn btn--outline" type="button" data-close-modal="modalRegDetail">Fechar</button>
         <button class="btn btn--primary" type="button" id="btnEditReg">Editar dados</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Novo cadastro -->
+  <div class="modal" id="modalRegNew" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal="modalRegNew"></div>
+    <div class="modal__panel modal__panel--wide">
+      <div class="modal__head">
+        <h2 class="modal__title" id="regNewTitle">Novo cadastro</h2>
+        <button class="modal__close" data-close-modal="modalRegNew" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="regNewForm" novalidate>
+        <input type="hidden" id="rnAppointmentIds">
+        <div class="field">
+          <label class="field__label" for="rnNome">Nome completo</label>
+          <input class="input" type="text" id="rnNome" required>
+          <span class="field__error" id="rnNome-error"></span>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="rnNascimento">Data de nascimento</label>
+            <input class="input" type="date" id="rnNascimento">
+          </div>
+          <div class="field">
+            <label class="field__label" for="rnTelefone">Telefone</label>
+            <input class="input" type="tel" id="rnTelefone" required placeholder="(83) 9 9999-9999">
+            <span class="field__error" id="rnTelefone-error"></span>
+          </div>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="rnServico">Serviço</label>
+            <select class="input" id="rnServico" required>
+              <option value="">Selecione</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="rnStatus">Status</label>
+            <select class="input" id="rnStatus"></select>
+          </div>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="rnFrequencia">Frequência desejada</label>
+            <select class="input" id="rnFrequencia">
+              <option value="">—</option>
+              <option>1x por semana</option>
+              <option>2x por semana</option>
+              <option>3x por semana</option>
+              <option>Mais de 3x por semana</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="rnPagamento">Como deseja realizar o pagamento?</label>
+            <select class="input" id="rnPagamento">
+              <option value="">Selecione</option>
+              <option>Pix</option>
+              <option>Dinheiro</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="rnObservacoes">Observações</label>
+          <textarea class="input input--textarea" id="rnObservacoes" rows="3"></textarea>
+        </div>
+        <label class="field field--check">
+          <input type="checkbox" id="rnListaEspera">
+          <span>Incluir na lista de espera</span>
+        </label>
+        <p class="form-status" id="regNewStatus" role="status" aria-live="polite"></p>
+        <div class="modal__actions">
+          <button class="btn btn--outline" type="button" data-close-modal="modalRegNew">Cancelar</button>
+          <button class="btn btn--primary" type="submit">Salvar cadastro</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Pacientes da agenda sem cadastro -->
+  <div class="modal" id="modalRegFromAgenda" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal="modalRegFromAgenda"></div>
+    <div class="modal__panel modal__panel--wide">
+      <div class="modal__head">
+        <h2 class="modal__title">Cadastrar da agenda</h2>
+        <button class="modal__close" data-close-modal="modalRegFromAgenda" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p class="modal__sub">Pessoas com agendamento que ainda não têm ficha de paciente.</p>
+      <div id="regFromAgendaList"></div>
+      <div class="empty-state" id="regFromAgendaEmpty" hidden>
+        <p>Todos os agendamentos já estão ligados a um cadastro.</p>
+      </div>
+      <div class="modal__actions">
+        <button class="btn btn--outline" type="button" data-close-modal="modalRegFromAgenda">Fechar</button>
       </div>
     </div>
   </div>
@@ -501,7 +923,7 @@
     <div class="modal__backdrop" data-close-modal="modalNewDupla"></div>
     <div class="modal__panel modal__panel--wide">
       <div class="modal__head">
-        <h2 class="modal__title">Criar dupla</h2>
+        <h2 class="modal__title">Formar nova dupla</h2>
         <button class="modal__close" data-close-modal="modalNewDupla" aria-label="Fechar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
@@ -592,6 +1014,72 @@
     </div>
   </div>
 
+  <!-- Modal: Novo / editar agendamento -->
+  <div class="modal" id="modalAppointment" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal="modalAppointment"></div>
+    <div class="modal__panel">
+      <div class="modal__head">
+        <h2 class="modal__title" id="aptModalTitle">Novo agendamento</h2>
+        <button class="modal__close" data-close-modal="modalAppointment" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="appointmentForm" novalidate>
+        <input type="hidden" id="aptId">
+        <div class="field">
+          <label class="field__label" for="aptPatientSearch">Paciente</label>
+          <input class="input" type="text" id="aptPatientSearch" placeholder="Buscar por nome ou telefone" autocomplete="off">
+          <input type="hidden" id="aptPatientId">
+          <div class="apt-suggest" id="aptSuggest" hidden></div>
+          <p class="field__hint" id="aptPatientPicked"></p>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="aptStarts">Data e horário</label>
+            <input class="input" type="datetime-local" id="aptStarts" required>
+            <span class="field__error" id="aptStarts-error"></span>
+          </div>
+          <div class="field">
+            <label class="field__label" for="aptDuration">Duração (min)</label>
+            <input class="input" type="number" id="aptDuration" value="50" min="15" step="5">
+          </div>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="aptService">Serviço</label>
+            <select class="input" id="aptService">
+              <option value="">Selecione</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="aptStatus">Status</label>
+            <select class="input" id="aptStatus">
+              <option>Agendado</option>
+              <option>Confirmado</option>
+              <option>Realizado</option>
+              <option>Cancelado</option>
+              <option>Faltou</option>
+              <option>Reagendado</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="aptNotes">Observações</label>
+          <textarea class="input input--textarea" id="aptNotes" rows="3"></textarea>
+        </div>
+        <p class="form-status" id="aptFormStatus" role="status" aria-live="polite"></p>
+        <div class="modal__actions modal__actions--between">
+          <button class="btn btn--danger" type="button" id="btnDeleteAppointment" hidden>Excluir</button>
+          <div>
+            <button class="btn btn--outline btn--sm" type="button" id="btnAptCreateReg" hidden>Criar cadastro</button>
+            <button class="btn btn--outline" type="button" data-close-modal="modalAppointment">Cancelar</button>
+            <button class="btn btn--primary" type="submit">Salvar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal: Confirmar exclusão -->
   <div class="modal" id="modalConfirm" aria-hidden="true">
     <div class="modal__backdrop" data-close-modal="modalConfirm"></div>
@@ -607,6 +1095,26 @@
         <button class="btn btn--outline" type="button" data-close-modal="modalConfirm">Cancelar</button>
         <button class="btn btn--danger" type="button" id="btnConfirmAction">Confirmar</button>
       </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modalRecord" aria-hidden="true">
+    <div class="modal__backdrop" data-close-modal="modalRecord"></div>
+    <div class="modal__panel">
+      <div class="modal__head">
+        <h2 class="modal__title" id="recordTitle">Novo registro</h2>
+        <button class="modal__close" data-close-modal="modalRecord" aria-label="Fechar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="recordForm">
+        <div id="recordFields"></div>
+        <p class="form-status" id="recordStatus"></p>
+        <div class="modal__actions">
+          <button class="btn btn--outline" type="button" data-close-modal="modalRecord">Cancelar</button>
+          <button class="btn btn--primary" type="submit">Salvar</button>
+        </div>
+      </form>
     </div>
   </div>
 
