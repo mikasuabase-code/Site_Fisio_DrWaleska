@@ -1,18 +1,20 @@
 """Dra. Waleska Paula — Aplicativo + Painel Administrativo.
 
-Servidor Flask com banco SQLite persistente.
-Serve as páginas públicas existentes e a área administrativa /admin.
+Servidor Flask. Persistencia principal: PostgreSQL/Supabase via DATABASE_URL.
+SQLite em data/waleska.db permanece como fallback local.
+Serve as paginas publicas existentes e a area administrativa /admin.
 """
 
 import json
 import os
 import secrets
-import sqlite3
 from datetime import datetime, timedelta
 from functools import wraps
 
-from flask import Flask, g, jsonify, redirect, request, send_from_directory, session
+from flask import Flask, jsonify, redirect, request, send_from_directory, session
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from db import backend_label, close_db as close_db_connection, get_db, using_postgres
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
@@ -51,8 +53,8 @@ def load_env_file(path):
 
 load_env_file(ENV_PATH)
 
-# Backend de dados: "supabase" (produção) ou "sqlite" (local).
-DB_BACKEND = (os.environ.get("DB_BACKEND") or "sqlite").strip().lower()
+# postgres/supabase = DATABASE_URL; sqlite = fallback local.
+DB_BACKEND = backend_label()
 
 app = Flask(__name__, static_folder=None)
 
@@ -157,19 +159,9 @@ DEFAULT_SERVICES = [
 # Database helpers
 # ---------------------------------------------------------------
 
-def get_db():
-    if "db" not in g:
-        g.db = sqlite3.connect(DB_PATH)
-        g.db.row_factory = sqlite3.Row
-        g.db.execute("PRAGMA foreign_keys = ON")
-    return g.db
-
-
 @app.teardown_appcontext
 def close_db(exc):
-    db = g.pop("db", None)
-    if db is not None:
-        db.close()
+    close_db_connection(exc)
 
 
 def now_iso():
@@ -188,7 +180,24 @@ def calc_idade(nascimento):
     return max(idade, 0)
 
 
+def decode_json(value, default=None):
+    if default is None:
+        default = []
+    if value is None or value == "":
+        return default
+    if isinstance(value, (dict, list)):
+        return value
+    try:
+        return json.loads(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def init_db():
+    if using_postgres():
+        return
+    import sqlite3
+
     db = sqlite3.connect(DB_PATH)
     db.row_factory = sqlite3.Row
     db.executescript(
@@ -577,7 +586,7 @@ def get_cadastro_config():
     ).fetchall()
     for row in rows:
         try:
-            cfg[row["chave"]] = json.loads(row["valor"] or "[]")
+            cfg[row["chave"]] = decode_json(row["valor"], [])
         except (ValueError, TypeError):
             cfg[row["chave"]] = []
     return cfg
@@ -613,13 +622,17 @@ def get_setting_text(db, chave, default=""):
     raw = row["valor"]
     if raw is None:
         return default
+    if isinstance(raw, (dict, list)):
+        return json.dumps(raw, ensure_ascii=False) if raw else default
+    if not isinstance(raw, str):
+        return str(raw)
     try:
         parsed = json.loads(raw)
         if isinstance(parsed, str):
             return parsed
     except (ValueError, TypeError):
         pass
-    return str(raw)
+    return raw
 
 
 def get_clinic_settings(db=None):
@@ -937,9 +950,9 @@ def row_to_registration(r):
         "servico_id": d.get("servico_id"),
         "servico": d.get("servico"),
         "valor": d.get("valor"),
-        "dias": json.loads(d["dias"]) if d.get("dias") else [],
+        "dias": decode_json(d.get("dias"), []),
         "frequencia": d.get("frequencia"),
-        "motivos": json.loads(d["motivos"]) if d.get("motivos") else [],
+        "motivos": decode_json(d.get("motivos"), []),
         "observacoes": d.get("observacoes"),
         "status": d.get("status"),
         "forma_pagamento": d.get("forma_pagamento") or "",
@@ -1152,9 +1165,9 @@ def api_admin_cadastro_update(reg_id):
     telefone = (data.get("telefone") if data.get("telefone") is not None else row["telefone"] or "").strip()
     observacoes = (data.get("observacoes") if data.get("observacoes") is not None else row["observacoes"] or "").strip()
     status = (data.get("status") if data.get("status") is not None else row["status"] or "").strip()
-    dias = data.get("dias") if data.get("dias") is not None else json.loads(row["dias"]) if row["dias"] else []
+    dias = data.get("dias") if data.get("dias") is not None else decode_json(row["dias"], [])
     frequencia = ((data.get("frequencia") if data.get("frequencia") is not None else row["frequencia"]) or "").strip()
-    motivos = data.get("motivos") if data.get("motivos") is not None else json.loads(row["motivos"]) if row["motivos"] else []
+    motivos = data.get("motivos") if data.get("motivos") is not None else decode_json(row["motivos"], [])
 
     if not nome or not telefone:
         return jsonify({"ok": False, "error": "Nome e telefone são obrigatórios."}), 400
@@ -1453,8 +1466,8 @@ def api_admin_waitlist_delete(wl_id):
 def row_to_dupla(r):
     return {
         "id": r["id"],
-        "paciente1": json.loads(r["paciente1"]),
-        "paciente2": json.loads(r["paciente2"]),
+        "paciente1": decode_json(r["paciente1"], {}),
+        "paciente2": decode_json(r["paciente2"], {}),
         "servico": r["servico"],
         "observacoes": r["observacoes"],
         "status": r["status"],
@@ -1615,7 +1628,7 @@ def api_admin_dupla_update(dupla_id):
     def return_to_waitlist(old_patient):
         if not old_patient:
             return
-        old = json.loads(old_patient) if isinstance(old_patient, str) else old_patient
+        old = decode_json(old_patient, {}) if not isinstance(old_patient, dict) else old_patient
         db.execute(
             """INSERT INTO waitlist
                (registration_id, nome, nascimento, idade, telefone, servico, dificuldades, observacoes, status, criadoEm, atualizadoEm)
@@ -1667,7 +1680,7 @@ def api_admin_dupla_delete(dupla_id):
 
     ts = now_iso()
     for patient in (row["paciente1"], row["paciente2"]):
-        p = json.loads(patient) if isinstance(patient, str) else patient
+        p = decode_json(patient, {}) if not isinstance(patient, dict) else patient
         db.execute(
             """INSERT INTO waitlist
                (registration_id, nome, nascimento, idade, telefone, servico, dificuldades, observacoes, status, criadoEm, atualizadoEm)
@@ -2694,6 +2707,7 @@ init_db()
 if __name__ == "__main__":
     print("=" * 60)
     print("Dra. Waleska Paula — servidor iniciado")
+    print("Backend        : " + backend_label())
     print("Página pública : http://localhost:8000/")
     print("Painel admin   : http://localhost:8000/admin")
     print("=" * 60)
