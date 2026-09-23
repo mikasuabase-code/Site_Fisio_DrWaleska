@@ -73,7 +73,8 @@
     agendaDate: new Date(),
     agendaItems: [],
     aptSuggestTimer: null,
-    payPeriodo: ""
+    payPeriodo: "",
+    alertas: []
   };
 
   var $ = function (id) {
@@ -336,7 +337,7 @@
         renderNext(d.proximos || []);
         renderAlerts(d.alertas || []);
         renderRecentes(d.recentes || []);
-        if ($("notifDot")) $("notifDot").hidden = !(d.alertas && d.alertas.length);
+        atualizarNotificacoes(d.alertas || []);
         state.agendaView = "week";
         carregarAgendaHome();
       })
@@ -388,6 +389,45 @@
         return '<a class="side-alert" href="' + escapeHtml(a.href || "#") + '">' + escapeHtml(a.texto) + "</a>";
       })
       .join("");
+  }
+
+  function fecharNotificacoes() {
+    var panel = $("notifPanel");
+    var btn = $("btnNotifications");
+    if (panel) panel.hidden = true;
+    if (btn) {
+      btn.classList.remove("is-open");
+      btn.setAttribute("aria-expanded", "false");
+    }
+  }
+
+  function atualizarNotificacoes(items) {
+    state.alertas = items || [];
+    if ($("notifDot")) $("notifDot").hidden = !state.alertas.length;
+    var list = $("notifList");
+    if (!list) return;
+    if (!state.alertas.length) {
+      list.innerHTML = '<p class="admin-notif__empty">Nenhuma notificação no momento.</p>';
+      return;
+    }
+    list.innerHTML = state.alertas
+      .map(function (a) {
+        return (
+          '<button type="button" class="admin-notif__item" data-notif-href="' +
+          escapeHtml(a.href || "#/inicio") +
+          '">' +
+          escapeHtml(a.texto) +
+          "</button>"
+        );
+      })
+      .join("");
+    list.querySelectorAll("[data-notif-href]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var href = btn.getAttribute("data-notif-href") || "#/inicio";
+        fecharNotificacoes();
+        window.location.hash = href;
+      });
+    });
   }
 
   function renderRecentes(items) {
@@ -2597,8 +2637,36 @@
       } else {
         bW.hidden = true;
       }
+      atualizarNotificacoes(d.alertas || []);
     }).catch(function () {});
   }
+
+  if ($("btnNotifications")) {
+    $("btnNotifications").addEventListener("click", function (ev) {
+      ev.stopPropagation();
+      var panel = $("notifPanel");
+      var btn = $("btnNotifications");
+      if (!panel || !btn) return;
+      var open = panel.hidden;
+      if (open) {
+        panel.hidden = false;
+        btn.classList.add("is-open");
+        btn.setAttribute("aria-expanded", "true");
+      } else {
+        fecharNotificacoes();
+      }
+    });
+  }
+
+  document.addEventListener("click", function (ev) {
+    var wrap = document.querySelector(".admin-bell-wrap");
+    if (!wrap || wrap.contains(ev.target)) return;
+    fecharNotificacoes();
+  });
+
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape") fecharNotificacoes();
+  });
 
   document.querySelectorAll("[data-logout]").forEach(function (link) {
     link.addEventListener("click", function (ev) {
