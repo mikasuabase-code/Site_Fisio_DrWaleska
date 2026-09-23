@@ -44,7 +44,8 @@
   function validar() {
     var ok = true;
     var email = (emailInput.value || "").trim();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    var arroba = email.indexOf("@");
+    if (!email || arroba < 1 || arroba === email.length - 1 || email.indexOf(".") < 0) {
       setErro("email", "Informe um e-mail válido.");
       ok = false;
     }
@@ -81,15 +82,28 @@
       })
     })
       .then(function (r) {
-        return r.json().then(function (body) {
-          return { ok: r.ok, body: body };
+        return r.text().then(function (texto) {
+          var corpo = null;
+          try {
+            corpo = texto ? JSON.parse(texto) : {};
+          } catch (e) {
+            corpo = null;
+          }
+          return { ok: r.ok, status: r.status, body: corpo };
         });
       })
       .then(function (res) {
-        if (!res.ok || !res.body.ok) {
-          throw new Error((res.body && res.body.error) || "Não foi possível entrar. Tente novamente.");
+        if (res.ok && res.body && res.body.ok) {
+          window.location.replace("/admin#/inicio");
+          return;
         }
-        window.location.replace("/admin#/inicio");
+        var msg = (res.body && res.body.error) || "";
+        if (!msg) {
+          msg = res.status >= 500
+            ? "Servidor indisponível no momento. Tente novamente em instantes."
+            : "Não foi possível entrar. Verifique e-mail e senha.";
+        }
+        throw new Error(msg);
       })
       .catch(function (err) {
         setStatus(err.message || "Não foi possível entrar. Tente novamente.", "error");
