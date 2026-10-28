@@ -333,6 +333,13 @@
           </div>
         </section>
 
+        <!-- ============================ FICHA DO PACIENTE ============================ -->
+        <section class="admin-view" id="view-patient" data-view-panel="patient" hidden>
+          <div id="patientPage">
+            <p class="admin-card__sub">Carregando ficha...</p>
+          </div>
+        </section>
+
         <!-- ============================ LISTA DE ESPERA ============================ -->
         <section class="admin-view" id="view-waitlist" data-view-panel="waitlist" hidden>
           <div class="admin-toolbar">
@@ -747,7 +754,7 @@
           <input class="input" type="text" id="rnNome" required>
           <span class="field__error" id="rnNome-error"></span>
         </div>
-        <div class="field__row">
+         <div class="field__row">
           <div class="field">
             <label class="field__label" for="rnNascimento">Data de nascimento</label>
             <input class="input" type="date" id="rnNascimento">
@@ -756,6 +763,59 @@
             <label class="field__label" for="rnTelefone">Telefone</label>
             <input class="input" type="tel" id="rnTelefone" required placeholder="(83) 9 9999-9999">
             <span class="field__error" id="rnTelefone-error"></span>
+          </div>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="rnSexo">Sexo</label>
+            <select class="input" id="rnSexo">
+              <option value="">Selecione</option>
+              <option>Feminino</option>
+              <option>Masculino</option>
+              <option>Outro</option>
+              <option>Prefiro não informar</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="rnEstadoCivil">Estado civil</label>
+            <select class="input" id="rnEstadoCivil">
+              <option value="">Selecione</option>
+              <option>Solteiro(a)</option>
+              <option>Casado(a)</option>
+              <option>União estável</option>
+              <option>Divorciado(a)</option>
+              <option>Viúvo(a)</option>
+            </select>
+          </div>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="rnEmail">E-mail</label>
+            <input class="input" type="email" id="rnEmail" placeholder="opcional">
+          </div>
+          <div class="field">
+            <label class="field__label" for="rnCpf">CPF</label>
+            <input class="input" type="text" id="rnCpf" placeholder="000.000.000-00">
+          </div>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="rnProfissao">Profissão</label>
+            <input class="input" type="text" id="rnProfissao">
+          </div>
+          <div class="field">
+            <label class="field__label" for="rnQueixa">Queixa principal</label>
+            <select class="input" id="rnQueixa">
+              <option value="">Selecione</option>
+              <option>Dor lombar</option>
+              <option>Dor cervical</option>
+              <option>Dor no joelho</option>
+              <option>Dor no ombro</option>
+              <option>Postura</option>
+              <option>Reabilitação pós-cirúrgica</option>
+              <option>Fortalecimento</option>
+              <option>Outro</option>
+            </select>
           </div>
         </div>
         <div class="field__row">
@@ -869,6 +929,136 @@
             <option>3x por semana</option>
             <option>Mais de 3x por semana</option>
           </select>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="reSexo">Sexo</label>
+            <select class="input" id="reSexo">
+              <option value="">Selecione</option>
+              <option>Feminino</option>
+              <option>Masculino</option>
+              <option>Outro</option>
+              <option>Prefiro não informar</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="reEstadoCivil">Estado civil</label>
+            <select class="input" id="reEstadoCivil">
+              <option value="">Selecione</option>
+              <option>Solteiro(a)</option>
+              <option>Casado(a)</option>
+              <option>União estável</option>
+              <option>Divorciado(a)</option>
+              <option>Viúvo(a)</option>
+            </select>
+          </div>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="reEmail">E-mail</label>
+            <input class="input" type="email" id="reEmail">
+          </div>
+          <div class="field">
+            <label class="field__label" for="reCpf">CPF</label>
+            <input class="input" type="text" id="reCpf" placeholder="000.000.000-00">
+          </div>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="reProfissao">Profissão</label>
+            <input class="input" type="text" id="reProfissao">
+          </div>
+          <div class="field">
+            <label class="field__label" for="reQueixa">Queixa principal</label>
+            <select class="input" id="reQueixa">
+              <option value="">Selecione</option>
+              <option>Dor lombar</option>
+              <option>Dor cervical</option>
+              <option>Dor no joelho</option>
+              <option>Dor no ombro</option>
+              <option>Postura</option>
+              <option>Reabilitação pós-cirúrgica</option>
+              <option>Fortalecimento</option>
+              <option>Outro</option>
+            </select>
+          </div>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="reObjetivo">Objetivo do tratamento</label>
+            <select class="input" id="reObjetivo">
+              <option value="">Selecione</option>
+              <option>Aliviar dor</option>
+              <option>Melhorar postura</option>
+              <option>Fortalecer</option>
+              <option>Ganhar flexibilidade</option>
+              <option>Reabilitação</option>
+              <option>Condicionamento</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="reDiagnostico">Diagnóstico</label>
+            <select class="input" id="reDiagnostico">
+              <option value="">Selecione</option>
+              <option>Lombalgia</option>
+              <option>Cervicalgia</option>
+              <option>Tendinopatia</option>
+              <option>Artrose</option>
+              <option>Escoliose</option>
+              <option>Hérnia de disco</option>
+              <option>Sem diagnóstico definido</option>
+            </select>
+          </div>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="reCondicoes">Condições</label>
+            <select class="input" id="reCondicoes">
+              <option value="">Selecione</option>
+              <option>Nenhuma</option>
+              <option>Hipertensão</option>
+              <option>Diabetes</option>
+              <option>Osteoporose</option>
+              <option>Hérnia de disco</option>
+              <option>Prótese</option>
+              <option>Gestante</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="reAlergias">Alergias</label>
+            <select class="input" id="reAlergias">
+              <option value="">Selecione</option>
+              <option>Nenhuma conhecida</option>
+              <option>Medicamentos</option>
+              <option>Látex</option>
+              <option>Outra</option>
+            </select>
+          </div>
+        </div>
+        <div class="field__row">
+          <div class="field">
+            <label class="field__label" for="reMedicamentos">Medicamentos</label>
+            <input class="input" type="text" id="reMedicamentos" placeholder="Nenhum / listar">
+          </div>
+          <div class="field">
+            <label class="field__label" for="reRestricoes">Restrições</label>
+            <select class="input" id="reRestricoes">
+              <option value="">Selecione</option>
+              <option>Sem restrições</option>
+              <option>Evitar carga axial</option>
+              <option>Evitar flexão de tronco</option>
+              <option>Evitar impacto</option>
+              <option>Restrição médica</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="reEndereco">Endereço</label>
+          <input class="input" type="text" id="reEndereco">
+        </div>
+        <div class="field">
+          <label class="field__label" for="reObsClinicas">Observações clínicas</label>
+          <textarea class="input input--textarea" id="reObsClinicas" rows="2"></textarea>
         </div>
         <div class="field">
           <label class="field__label" for="reObservacoes">Observações</label>

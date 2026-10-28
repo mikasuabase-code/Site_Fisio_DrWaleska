@@ -20,7 +20,8 @@
     documents: { title: "Documentos", sub: "Registros e documentos da clínica." },
     comms: { title: "Comunicação", sub: "Contato com pacientes via WhatsApp." },
     users: { title: "Usuários", sub: "Acesso ao painel administrativo." },
-    settings: { title: "Configurações", sub: "Conta de acesso e campos do formulário de cadastro." }
+    settings: { title: "Configurações", sub: "Conta de acesso e campos do formulário de cadastro." },
+    patient: { title: "Ficha do paciente", sub: "Prontuário clínico completo." }
   };
 
   var APT_STATUS_CLASS = {
@@ -68,6 +69,7 @@
     duplaPick2: null,
     duplaSugestoes: [],
     prontuario: null,
+    patientId: null,
     confirmAction: null,
     agendaView: "week",
     agendaDate: new Date(),
@@ -224,7 +226,8 @@
       sec.hidden = sec.getAttribute("data-view-panel") !== nome;
     });
     document.querySelectorAll(".admin-nav__link").forEach(function (link) {
-      link.classList.toggle("is-active", link.getAttribute("data-view") === nome);
+      var view = link.getAttribute("data-view");
+      link.classList.toggle("is-active", view === nome || (nome === "patient" && view === "registrations"));
     });
 
     $("pageTitle").textContent = VIEWS[nome].title;
@@ -235,6 +238,7 @@
     if (nome === "agenda") carregarAgenda();
     if (nome === "services") carregarServicos();
     if (nome === "registrations") carregarCadastros();
+    if (nome === "patient") carregarFichaPaciente();
     if (nome === "waitlist") carregarWaitlist();
     if (nome === "duplas") carregarDuplas();
     if (nome === "evaluations") carregarAvaliacoes();
@@ -251,6 +255,12 @@
   function rotaAtual() {
     var hash = (window.location.hash || "").replace(/^#\/?/, "");
     if (!hash) return "overview";
+    var parts = hash.split("/");
+    if (parts[0] === "pacientes" && parts[1] && /^\d+$/.test(parts[1])) {
+      state.patientId = Number(parts[1]);
+      return "patient";
+    }
+    state.patientId = null;
     return ROUTES[hash] || "overview";
   }
 
@@ -717,7 +727,7 @@
           '<td class="hide-sm cell-muted">' + fmtData(r.criadoEm) + "</td>" +
           "<td>" + pill(r.status) + "</td>" +
           '<td class="th-actions"><div class="row-actions">' +
-          '<button class="btn btn--outline btn--sm" data-acao="ver-cadastro" data-id="' + r.id + '">Ver</button>' +
+          '<button class="btn btn--outline btn--sm" data-acao="ver-cadastro" data-id="' + r.id + '">Abrir ficha</button>' +
           '<button class="btn btn--outline btn--sm" data-acao="editar-cadastro" data-id="' + r.id + '">Editar</button>' +
           '<button class="btn btn--danger btn--sm" data-acao="excluir-cadastro" data-id="' + r.id + '">Excluir</button>' +
           "</div></td>" +
@@ -750,30 +760,39 @@
   }
 
   function abrirDetalheCadastro(id) {
-    var r = state.registrations.find(function (x) {
-      return x.id === id;
-    });
-    if (!r) return;
-    state.prontuario = { paciente: r, tab: "dados" };
-    $("regDetailTitle").textContent = r.nome;
-    $("btnEditReg").setAttribute("data-id", r.id);
-    document.querySelectorAll("[data-ptab]").forEach(function (btn) {
-      btn.classList.toggle("is-active", btn.getAttribute("data-ptab") === "dados");
-    });
-    renderProntuarioTab("dados");
-    abrirModal("modalRegDetail");
-    api("GET", "/api/admin/cadastros/" + r.id + "/prontuario")
-      .then(function (res) {
-        state.prontuario = res.data || state.prontuario;
-        state.prontuario.tab = state.prontuario.tab || "dados";
-        renderProntuarioTab(state.prontuario.tab);
-      })
-      .catch(function () {
-        var box = $("regDetailBody");
-        if (box && state.prontuario.tab !== "dados") {
-          box.innerHTML = "<p class='admin-card__sub'>Não foi possível carregar o prontuário.</p>";
-        }
+    window.location.hash = "#/pacientes/" + id;
+  }
+
+  function iniciais(nome) {
+    return String(nome || "")
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(function (p) { return p.charAt(0).toUpperCase(); })
+      .join("") || "?";
+  }
+
+  function dash(v) {
+    return v == null || v === "" ? "—" : escapeHtml(v);
+  }
+
+  function setSelectValue(id, value) {
+    var el = $(id);
+    if (!el) return;
+    var val = value || "";
+    if (val) {
+      var found = false;
+      Array.prototype.forEach.call(el.options, function (opt) {
+        if (opt.value === val) found = true;
       });
+      if (!found) {
+        var extra = document.createElement("option");
+        extra.value = val;
+        extra.textContent = val;
+        el.appendChild(extra);
+      }
+    }
+    el.value = val;
   }
 
   function prontuarioEmpty(txt) {
@@ -799,11 +818,15 @@
   function recarregarProntuario(keepTab) {
     var p = (state.prontuario && state.prontuario.paciente) || {};
     if (!p.id) return Promise.resolve();
-    var tab = keepTab || (state.prontuario && state.prontuario.tab) || "dados";
+    var tab = keepTab || (state.prontuario && state.prontuario.tab) || "visao";
     return api("GET", "/api/admin/cadastros/" + p.id + "/prontuario").then(function (res) {
       state.prontuario = res.data || state.prontuario;
       state.prontuario.tab = tab;
-      renderProntuarioTab(tab);
+      if (state.view === "patient") {
+        renderFichaPaciente(tab);
+      } else {
+        renderProntuarioTab(tab);
+      }
     });
   }
 
@@ -853,11 +876,11 @@
         "Nova avaliação",
         fieldHtml("rNome", "Paciente", "text", 'value="' + escapeHtml(nome) + '" readonly') +
           fieldHtml("rData", "Data", "date", 'value="' + hoje + '"') +
-          fieldHtml("rQueixa", "Queixa principal", "textarea") +
-          fieldHtml("rObj", "Objetivos", "textarea") +
+          selectHtml("rQueixa", "Queixa principal", ["Dor lombar", "Dor cervical", "Dor no joelho", "Dor no ombro", "Postura", "Reabilitação pós-cirúrgica", "Fortalecimento", "Outro"]) +
+          selectHtml("rObj", "Objetivos", ["Aliviar dor", "Melhorar postura", "Fortalecer", "Ganhar flexibilidade", "Reabilitação", "Condicionamento"]) +
           fieldHtml("rHist", "Histórico", "textarea") +
-          fieldHtml("rFunc", "Avaliação funcional", "textarea") +
-          fieldHtml("rPlano", "Plano terapêutico", "textarea")
+          selectHtml("rFunc", "Avaliação funcional", ["Sem alteração", "Limitação de amplitude", "Fraqueza muscular", "Instabilidade", "Dor à palpaçao", "Compensação postural"]) +
+          selectHtml("rPlano", "Plano terapêutico", ["Pilates clínico", "Fisioterapia ortopédica", "RPG", "Fortalecimento progressivo", "Alongamento e mobilidade", "Reavaliação em 30 dias"])
       );
     } else if (kind === "evo") {
       openRecord(
@@ -865,10 +888,10 @@
         "Nova evolução",
         fieldHtml("rNome", "Paciente", "text", 'value="' + escapeHtml(nome) + '" readonly') +
           fieldHtml("rData", "Data", "date", 'value="' + hoje + '"') +
-          fieldHtml("rProc", "Procedimentos", "textarea") +
+          selectHtml("rProc", "Procedimentos", ["Pilates clínico", "Liberação miofascial", "Mobilização articular", "Fortalecimento", "Alongamento", "Educação postural"]) +
           fieldHtml("rEx", "Exercícios", "textarea") +
-          fieldHtml("rResp", "Resposta do paciente", "textarea") +
-          fieldHtml("rCond", "Próxima conduta", "textarea")
+          selectHtml("rResp", "Resposta do paciente", ["Melhora", "Estável", "Piora pontual", "Dor residual", "Boa adesão", "Baixa adesão"]) +
+          selectHtml("rCond", "Próxima conduta", ["Manter plano", "Progredir carga", "Reduzir intensidade", "Reavaliar", "Alta prevista"])
       );
     } else if (kind === "doc") {
       openRecord(
@@ -876,7 +899,8 @@
         "Novo documento",
         fieldHtml("rTitulo", "Título") +
           fieldHtml("rNome", "Paciente", "text", 'value="' + escapeHtml(nome) + '" readonly') +
-          fieldHtml("rTipo", "Tipo") +
+          '<div class="field"><label class="field__label" for="rTipo">Tipo</label><select class="input" id="rTipo"><option value="">Selecione</option><option>PDF</option><option>Foto / print</option><option>Exame</option><option>Laudo</option><option>Receita</option><option>Encaminhamento</option><option>Outro</option></select></div>' +
+          '<div class="field"><label class="field__label" for="rArquivo">Arquivo (PDF, foto ou print)</label><input class="input" type="file" id="rArquivo" accept=".pdf,image/*"></div>' +
           fieldHtml("rNotes", "Observações", "textarea")
       );
     } else if (kind === "pay") {
@@ -905,9 +929,9 @@
     recordPatientId = p.id || null;
   }
 
-  function renderProntuarioTab(tab) {
+  function renderProntuarioTab(tab, target) {
     var p = (state.prontuario && state.prontuario.paciente) || {};
-    var body = $("regDetailBody");
+    var body = target || $("fichaBody") || $("regDetailBody");
     if (!body) return;
     if (tab === "dados") {
       body.innerHTML =
@@ -1040,24 +1064,34 @@
     if (tab === "documentos") {
       var docs = (state.prontuario && state.prontuario.documentos) || [];
       body.innerHTML =
-        prontuarioAction("Novo documento", "doc") +
+        prontuarioAction("Enviar PDF, foto ou print", "doc") +
         (docs.length
           ? prontuarioItems(docs, function (d) {
+              var preview = "";
+              if (d.is_image && d.url) {
+                preview = '<div class="ficha-doc"><img src="' + escapeHtml(d.url) + '" alt="' + escapeHtml(d.titulo || "documento") + '">';
+              } else {
+                preview = '<div class="ficha-doc">';
+              }
               return (
-                '<article class="prontuario-item"><strong>' +
+                '<article class="prontuario-item">' + preview + "<div><strong>" +
                 escapeHtml(d.titulo) +
                 "</strong><p>" +
                 escapeHtml(d.tipo || "Documento") +
                 " · " +
                 escapeHtml(fmtData(d.criadoEm)) +
+                (d.arquivo_nome ? " · " + escapeHtml(d.arquivo_nome) : "") +
                 "</p><p>" +
                 escapeHtml(d.notes || "") +
-                '</p><div class="prontuario-item__actions"><button class="btn btn--danger btn--sm" type="button" data-prontuario-del="doc" data-id="' +
+                '</p><div class="prontuario-item__actions">' +
+                (d.url ? '<a class="btn btn--outline btn--sm" href="' + escapeHtml(d.url) + '" target="_blank" rel="noopener">Abrir</a>' : "") +
+                '<button class="btn btn--danger btn--sm" type="button" data-prontuario-del="doc" data-id="' +
                 d.id +
-                '">Excluir</button></div></article>'
+                '">Excluir</button></div></div></div></article>'
               );
             })
-          : prontuarioEmpty("Nenhum documento registrado."));
+          : prontuarioEmpty("Nenhum documento registrado. Envie PDF, foto ou print.")) +
+        '<p class="admin-card__sub">Formatos: PDF, JPG, PNG ou WEBP até 10 MB.</p>';
       bindProntuarioActions(body);
       return;
     }
@@ -1108,6 +1142,203 @@
       : prontuarioEmpty("Ainda não há histórico clínico.");
   }
 
+  var FICHA_TABS = [
+    ["visao", "Visão geral"],
+    ["dados", "Dados pessoais"],
+    ["avaliacao", "Avaliação"],
+    ["evolucoes", "Evoluções"],
+    ["agenda", "Agenda"],
+    ["exercicios", "Exercícios"],
+    ["documentos", "Documentos"],
+    ["financeiro", "Financeiro"],
+    ["historico", "Histórico"]
+  ];
+
+  function carregarFichaPaciente() {
+    var id = state.patientId;
+    var root = $("patientPage");
+    if (!id || !root) return;
+    root.innerHTML = "<p class='admin-card__sub'>Carregando ficha...</p>";
+    api("GET", "/api/admin/cadastros/" + id + "/prontuario")
+      .then(function (res) {
+        state.prontuario = res.data || {};
+        state.prontuario.tab = state.prontuario.tab || "visao";
+        var p = state.prontuario.paciente || {};
+        $("pageTitle").textContent = p.nome || "Ficha do paciente";
+        $("pageSubtitle").textContent = "Prontuário clínico completo.";
+        renderFichaPaciente(state.prontuario.tab);
+      })
+      .catch(function (err) {
+        root.innerHTML = "<p class='admin-card__sub'>" + escapeHtml(err.message) + "</p>";
+      });
+  }
+
+  function fichaDl(rows) {
+    return (
+      '<dl class="ficha-dl">' +
+      rows.map(function (r) {
+        return "<dt>" + escapeHtml(r[0]) + "</dt><dd>" + (r[2] ? r[1] : dash(r[1])) + "</dd>";
+      }).join("") +
+      "</dl>"
+    );
+  }
+
+  function renderFichaPaciente(tab) {
+    var root = $("patientPage");
+    if (!root) return;
+    var p = (state.prontuario && state.prontuario.paciente) || {};
+    tab = tab || "visao";
+    if (state.prontuario) state.prontuario.tab = tab;
+    var foto = p.foto_url
+      ? '<img src="' + escapeHtml(p.foto_url + (p.foto_url.indexOf("?") >= 0 ? "&" : "?") + "t=" + encodeURIComponent(p.atualizadoEm || "")) + '" alt="Foto de ' + escapeHtml(p.nome || "") + '">'
+      : iniciais(p.nome);
+    var idadeTxt = p.idade != null ? p.idade + " anos" : "—";
+    var nascTxt = p.nascimento ? " (" + fmtData(p.nascimento) + ")" : "";
+    var evals = (state.prontuario && state.prontuario.avaliacoes) || [];
+    var lastEval = evals[0];
+    var pays = (state.prontuario && state.prontuario.financeiro) || [];
+    var resumo = (state.prontuario && state.prontuario.resumo_financeiro) || {};
+    var agenda = (state.prontuario && state.prontuario.agenda) || [];
+    var proxima = agenda.filter(function (a) {
+      return String(a.starts_at || "") >= ymd(new Date()) && a.status !== "Cancelado";
+    }).sort(function (a, b) { return String(a.starts_at).localeCompare(String(b.starts_at)); })[0];
+    var tabs = FICHA_TABS.map(function (t) {
+      return '<button class="ficha-tabs__btn' + (t[0] === tab ? " is-active" : "") + '" type="button" data-ftab="' + t[0] + '">' + t[1] + "</button>";
+    }).join("");
+    var inner = "";
+    if (tab === "visao") {
+      inner =
+        '<div class="ficha-layout"><div class="ficha-cols">' +
+        '<div class="admin-card"><h3 class="admin-card__title">Informações pessoais</h3>' +
+        fichaDl([
+          ["Nome", p.nome],
+          ["Nascimento", p.nascimento ? fmtData(p.nascimento) + (p.idade != null ? " (" + p.idade + " anos)" : "") : "—", true],
+          ["Sexo", p.sexo],
+          ["CPF", p.cpf],
+          ["WhatsApp", p.telefone],
+          ["E-mail", p.email],
+          ["Estado civil", p.estado_civil],
+          ["Profissão", p.profissao]
+        ]) +
+        "</div><div class='admin-card'><h3 class='admin-card__title'>Resumo clínico</h3>" +
+        fichaDl([
+          ["Queixa principal", p.queixa_principal],
+          ["Objetivo", p.objetivo_tratamento],
+          ["Diagnóstico", p.diagnostico],
+          ["Condições", p.condicoes],
+          ["Alergias", p.alergias],
+          ["Medicamentos", p.medicamentos],
+          ["Restrições", p.restricoes],
+          ["Observações", p.observacoes_clinicas || p.observacoes]
+        ]) +
+        "</div><div class='admin-card'><h3 class='admin-card__title'>Última avaliação</h3>" +
+        (lastEval
+          ? "<p>" + escapeHtml(fmtData(lastEval.evaluated_at)) + "</p><p class='admin-card__sub'>" + escapeHtml(lastEval.queixa || "Registrada") + "</p>"
+          : "<p class='admin-card__sub'>Nenhuma avaliação registrada.</p>") +
+        "</div></div><aside class='ficha-side'>" +
+        '<div class="admin-card"><h3 class="admin-card__title">Alertas importantes</h3>' +
+        (Number(resumo.pendente) > 0
+          ? "<p>Pagamento pendente</p><p class='admin-card__sub'>" + moeda(resumo.pendente) + " em aberto</p>"
+          : "<p class='admin-card__sub'>Nenhum alerta no momento.</p>") +
+        "</div><div class='admin-card'><h3 class='admin-card__title'>Próxima sessão</h3>" +
+        (proxima
+          ? "<p>" + escapeHtml(fmtData(proxima.starts_at)) + " " + escapeHtml(String(proxima.starts_at || "").slice(11, 16)) + "</p><p class='admin-card__sub'>" + escapeHtml(proxima.service_name || "") + "</p>"
+          : "<p class='admin-card__sub'>Nenhuma sessão futura.</p>") +
+        '<button class="btn btn--outline btn--sm" type="button" data-ftab="agenda">Ver agenda</button></div>' +
+        '<div class="admin-card"><h3 class="admin-card__title">Situação financeira</h3>' +
+        fichaDl([
+          ["Serviço", p.servico],
+          ["Valor do plano", p.valor != null ? moeda(p.valor) : "—", true],
+          ["Valor pago", moeda(resumo.recebido), true]
+        ]) +
+        "</div></aside></div>";
+    } else if (tab === "dados") {
+      inner =
+        '<div class="admin-card"><div class="prontuario-toolbar"><button class="btn btn--primary btn--sm" type="button" data-ficha-edit="1">Editar dados</button></div>' +
+        fichaDl([
+          ["Nome", p.nome],
+          ["Nascimento", fmtData(p.nascimento), true],
+          ["Idade", p.idade != null ? p.idade + " anos" : "—", true],
+          ["Sexo", p.sexo],
+          ["CPF", p.cpf],
+          ["Telefone", p.telefone],
+          ["E-mail", p.email],
+          ["Estado civil", p.estado_civil],
+          ["Profissão", p.profissao],
+          ["Endereço", p.endereco],
+          ["Serviço", p.servico],
+          ["Frequência", p.frequencia],
+          ["Dias", (p.dias || []).join(", ")],
+          ["Queixa", p.queixa_principal],
+          ["Objetivo", p.objetivo_tratamento],
+          ["Diagnóstico", p.diagnostico],
+          ["Condições", p.condicoes],
+          ["Alergias", p.alergias],
+          ["Medicamentos", p.medicamentos],
+          ["Restrições", p.restricoes],
+          ["Observações clínicas", p.observacoes_clinicas],
+          ["Observações", p.observacoes],
+          ["Status", p.status],
+          ["Cadastrado em", fmtData(p.criadoEm), true]
+        ]) +
+        "</div>";
+    } else {
+      inner = "";
+    }
+    root.innerHTML =
+      '<p class="ficha-crumb"><a href="#/pacientes">Pacientes</a> / ' + escapeHtml(p.nome || "Paciente") + "</p>" +
+      '<div class="ficha-hero"><div class="ficha-hero__left"><div class="ficha-photo">' + foto +
+      '<button class="ficha-photo__btn" type="button" data-ficha-foto="1" aria-label="Alterar foto"></button></div>' +
+      "<div><h2>" + escapeHtml(p.nome || "") + "</h2><div class='ficha-hero__meta'><span>" + escapeHtml(idadeTxt + nascTxt) +
+      "</span><span>" + dash(p.sexo) + "</span><span>" + dash(p.telefone) + "</span><span>Cadastrada em " + escapeHtml(fmtData(p.criadoEm)) +
+      "</span></div><div class='ficha-hero__pills'>" + pill(p.status) + " " + (p.servico ? pill(p.servico) : "") +
+      "</div></div></div><div class='ficha-hero__actions'><button class='btn btn--primary btn--sm' type='button' data-prontuario-new='agenda'>Agendar sessão</button>" +
+      '<button class="btn btn--outline btn--sm" type="button" data-ficha-edit="1">Editar ficha</button></div></div>' +
+      '<div class="ficha-tabs" role="tablist">' + tabs + "</div><div id='fichaBody'>" + inner + "</div>";
+    if (tab !== "visao" && tab !== "dados") {
+      renderProntuarioTab(tab, $("fichaBody"));
+    }
+    bindFichaActions(root);
+  }
+
+  function bindFichaActions(root) {
+    if (!root) return;
+    root.querySelectorAll("[data-ftab]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        renderFichaPaciente(btn.getAttribute("data-ftab"));
+      });
+    });
+    root.querySelectorAll("[data-ficha-edit]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var p = (state.prontuario && state.prontuario.paciente) || {};
+        fillEditFromPatient(p);
+      });
+    });
+    root.querySelectorAll("[data-ficha-foto]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.addEventListener("change", function () {
+          if (!input.files || !input.files[0]) return;
+          var p = (state.prontuario && state.prontuario.paciente) || {};
+          var fd = new FormData();
+          fd.append("arquivo", input.files[0]);
+          fetch("/api/admin/cadastros/" + p.id + "/foto", { method: "POST", body: fd, credentials: "same-origin" })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+              if (!data.ok) throw new Error(data.error || "Falha no upload.");
+              toast("Foto atualizada.");
+              recarregarProntuario();
+            })
+            .catch(function (err) { toast(err.message, true); });
+        });
+        input.click();
+      });
+    });
+    bindProntuarioActions(root.querySelector(".ficha-hero"));
+  }
+
   function preencherServicosCadastro(sel, valor) {
     if (!sel) return;
     sel.innerHTML = '<option value="">Selecione</option>';
@@ -1142,6 +1373,12 @@
         });
         if (match) $("rnServico").value = String(match.id);
       }
+      setSelectValue("rnSexo", prefill.sexo || "");
+      setSelectValue("rnEstadoCivil", prefill.estado_civil || "");
+      if ($("rnEmail")) $("rnEmail").value = prefill.email || "";
+      if ($("rnCpf")) $("rnCpf").value = prefill.cpf || "";
+      if ($("rnProfissao")) $("rnProfissao").value = prefill.profissao || "";
+      setSelectValue("rnQueixa", prefill.queixa_principal || "");
       fecharModal("modalRegFromAgenda");
       fecharModal("modalAppointment");
       abrirModal("modalRegNew");
@@ -1197,6 +1434,9 @@
     var r = state.registrations.find(function (x) {
       return x.id === id;
     });
+    if (!r && state.prontuario && state.prontuario.paciente && state.prontuario.paciente.id === id) {
+      r = state.prontuario.paciente;
+    }
     if (!r) return;
     $("regEditId").value = r.id;
     $("reNome").value = r.nome;
@@ -1205,9 +1445,34 @@
     preencherStatusSelect($("reStatus"), STATUS_CADASTRO, r.status);
     $("reFrequencia").value = r.frequencia || "";
     $("reObservacoes").value = r.observacoes || "";
+    setSelectValue("reSexo", r.sexo || "");
+    setSelectValue("reEstadoCivil", r.estado_civil || "");
+    if ($("reEmail")) $("reEmail").value = r.email || "";
+    if ($("reCpf")) $("reCpf").value = r.cpf || "";
+    if ($("reProfissao")) $("reProfissao").value = r.profissao || "";
+    setSelectValue("reQueixa", r.queixa_principal || "");
+    setSelectValue("reObjetivo", r.objetivo_tratamento || "");
+    setSelectValue("reDiagnostico", r.diagnostico || "");
+    setSelectValue("reCondicoes", r.condicoes || "");
+    setSelectValue("reAlergias", r.alergias || "");
+    if ($("reMedicamentos")) $("reMedicamentos").value = r.medicamentos || "";
+    setSelectValue("reRestricoes", r.restricoes || "");
+    if ($("reEndereco")) $("reEndereco").value = r.endereco || "";
+    if ($("reObsClinicas")) $("reObsClinicas").value = r.observacoes_clinicas || "";
     $("regEditStatus").textContent = "";
     fecharModal("modalRegDetail");
     abrirModal("modalRegEdit");
+  }
+
+  function fillEditFromPatient(r) {
+    if (!r) return;
+    var found = state.registrations.find(function (x) { return x.id === r.id; });
+    if (!found) state.registrations.push(r);
+    else {
+      var idx = state.registrations.indexOf(found);
+      state.registrations[idx] = r;
+    }
+    abrirEdicaoCadastro(r.id);
   }
 
   $("regTableBody").addEventListener("click", function (ev) {
@@ -1293,7 +1558,13 @@
       observacoes: $("rnObservacoes").value.trim(),
       lista_espera: $("rnListaEspera").checked,
       forma_pagamento: $("rnPagamento") ? $("rnPagamento").value : "",
-      appointment_ids: ids
+      appointment_ids: ids,
+      sexo: $("rnSexo") ? $("rnSexo").value : "",
+      estado_civil: $("rnEstadoCivil") ? $("rnEstadoCivil").value : "",
+      email: $("rnEmail") ? $("rnEmail").value.trim() : "",
+      cpf: $("rnCpf") ? $("rnCpf").value.trim() : "",
+      profissao: $("rnProfissao") ? $("rnProfissao").value.trim() : "",
+      queixa_principal: $("rnQueixa") ? $("rnQueixa").value : ""
     };
     api("POST", "/api/admin/cadastros", payload)
       .then(function () {
@@ -1333,7 +1604,21 @@
       telefone: $("reTelefone").value.trim(),
       status: $("reStatus").value,
       frequencia: $("reFrequencia").value,
-      observacoes: $("reObservacoes").value.trim()
+      observacoes: $("reObservacoes").value.trim(),
+      sexo: $("reSexo") ? $("reSexo").value : "",
+      estado_civil: $("reEstadoCivil") ? $("reEstadoCivil").value : "",
+      email: $("reEmail") ? $("reEmail").value.trim() : "",
+      cpf: $("reCpf") ? $("reCpf").value.trim() : "",
+      profissao: $("reProfissao") ? $("reProfissao").value.trim() : "",
+      queixa_principal: $("reQueixa") ? $("reQueixa").value : "",
+      objetivo_tratamento: $("reObjetivo") ? $("reObjetivo").value : "",
+      diagnostico: $("reDiagnostico") ? $("reDiagnostico").value : "",
+      condicoes: $("reCondicoes") ? $("reCondicoes").value : "",
+      alergias: $("reAlergias") ? $("reAlergias").value : "",
+      medicamentos: $("reMedicamentos") ? $("reMedicamentos").value.trim() : "",
+      restricoes: $("reRestricoes") ? $("reRestricoes").value : "",
+      endereco: $("reEndereco") ? $("reEndereco").value.trim() : "",
+      observacoes_clinicas: $("reObsClinicas") ? $("reObsClinicas").value.trim() : ""
     };
     if (!payload.nome || !payload.telefone) {
       $("regEditStatus").textContent = "Nome e telefone são obrigatórios.";
@@ -1345,6 +1630,7 @@
         fecharModal("modalRegEdit");
         toast("Cadastro atualizado.");
         carregarCadastros();
+        if (state.view === "patient") recarregarProntuario();
       })
       .catch(function (err) {
         $("regEditStatus").textContent = err.message;
@@ -2454,6 +2740,7 @@
         fecharModal("modalAppointment");
         toast(id ? "Agendamento atualizado." : "Agendamento criado.");
         carregarAgenda();
+        if (state.view === "patient") recarregarProntuario();
       })
       .catch(function (err) {
         status.textContent = err.message;
@@ -2470,6 +2757,13 @@
       return '<div class="field"><label class="field__label" for="' + id + '">' + label + '</label><textarea class="input input--textarea" id="' + id + '" rows="3" ' + extra + "></textarea></div>";
     }
     return '<div class="field"><label class="field__label" for="' + id + '">' + label + '</label><input class="input" type="' + (type || "text") + '" id="' + id + '" ' + extra + "></div>";
+  }
+
+  function selectHtml(id, label, options) {
+    var opts = '<option value="">Selecione</option>' + (options || []).map(function (o) {
+      return "<option>" + o + "</option>";
+    }).join("");
+    return '<div class="field"><label class="field__label" for="' + id + '">' + label + '</label><select class="input" id="' + id + '">' + opts + "</select></div>";
   }
 
   function openRecord(kind, title, html) {
@@ -2758,8 +3052,23 @@
     );
   });
   if ($("btnNewDoc")) $("btnNewDoc").addEventListener("click", function () {
-    openRecord("doc", "Novo documento", fieldHtml("rTitulo", "Título") + fieldHtml("rNome", "Paciente") + fieldHtml("rTipo", "Tipo") + fieldHtml("rNotes", "Observações", "textarea"));
+    openRecord(
+      "doc",
+      "Novo documento",
+      fieldHtml("rTitulo", "Título") +
+        fieldHtml("rNome", "Paciente") +
+        '<div class="field"><label class="field__label" for="rTipo">Tipo</label><select class="input" id="rTipo"><option value="">Selecione</option><option>PDF</option><option>Foto / print</option><option>Exame</option><option>Laudo</option><option>Receita</option><option>Encaminhamento</option><option>Outro</option></select></div>' +
+        '<div class="field"><label class="field__label" for="rArquivo">Arquivo (PDF, foto ou print)</label><input class="input" type="file" id="rArquivo" accept=".pdf,image/*"></div>' +
+        fieldHtml("rNotes", "Observações", "textarea")
+    );
   });
+
+  function afterRecordSaved() {
+    fecharModal("modalRecord");
+    toast("Registro salvo.");
+    if (state.view === "patient") recarregarProntuario();
+    else aplicarView(state.view);
+  }
 
   if ($("recordForm")) {
     $("recordForm").addEventListener("submit", function (ev) {
@@ -2779,18 +3088,35 @@
         url = "/api/admin/payments";
         payload = { patient_id: recordPatientId, patient_name: $("rNome").value, service_name: $("rServico") ? $("rServico").value : "", amount: $("rVal").value, method: $("rMethod") ? $("rMethod").value : "", status: $("rStatus").value, notes: $("rNotes").value };
       } else if (recordKind === "doc") {
-        url = "/api/admin/documents";
-        payload = { patient_id: recordPatientId, titulo: $("rTitulo").value, patient_name: $("rNome").value, tipo: $("rTipo").value, notes: $("rNotes").value };
+        var fd = new FormData();
+        if (recordPatientId) fd.append("patient_id", recordPatientId);
+        fd.append("titulo", $("rTitulo") ? $("rTitulo").value : "");
+        fd.append("patient_name", $("rNome") ? $("rNome").value : "");
+        fd.append("tipo", $("rTipo") ? $("rTipo").value : "");
+        fd.append("notes", $("rNotes") ? $("rNotes").value : "");
+        if ($("rArquivo") && $("rArquivo").files && $("rArquivo").files[0]) {
+          fd.append("arquivo", $("rArquivo").files[0]);
+        }
+        fetch("/api/admin/documents", { method: "POST", body: fd, credentials: "same-origin" })
+          .then(function (r) {
+            if (r.status === 401) {
+              window.location.replace("/admin-login");
+              throw new Error("Sessão expirada.");
+            }
+            return r.json().then(function (data) {
+              if (!r.ok || data.ok === false) throw new Error((data && data.error) || "Não foi possível enviar o arquivo.");
+              return data;
+            });
+          })
+          .then(afterRecordSaved)
+          .catch(function (err) {
+            $("recordStatus").textContent = err.message;
+            $("recordStatus").className = "form-status is-error";
+          });
+        return;
       }
       api("POST", url, payload)
-        .then(function () {
-          fecharModal("modalRecord");
-          toast("Registro salvo.");
-          aplicarView(state.view);
-          if (recordPatientId && $("modalRegDetail") && $("modalRegDetail").classList.contains("is-open")) {
-            recarregarProntuario();
-          }
-        })
+        .then(afterRecordSaved)
         .catch(function (err) {
           $("recordStatus").textContent = err.message;
           $("recordStatus").className = "form-status is-error";

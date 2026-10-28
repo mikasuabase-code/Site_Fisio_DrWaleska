@@ -5,14 +5,17 @@ SQLite em data/waleska.db permanece como fallback local.
 Serve as paginas publicas existentes e a area administrativa /admin.
 """
 
+import base64
 import json
 import os
 import secrets
+import uuid
 from datetime import datetime, timedelta
 from functools import wraps
 
 from flask import Flask, jsonify, redirect, request, send_from_directory, session
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 from db import backend_label, close_db as close_db_connection, get_db, using_postgres
 
@@ -21,8 +24,34 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 DB_PATH = os.path.join(DATA_DIR, "waleska.db")
 SECRET_PATH = os.path.join(DATA_DIR, "secret_key")
 ENV_PATH = os.path.join(BASE_DIR, ".env")
+UPLOAD_DIR = os.path.join(DATA_DIR, "uploads")
+PHOTO_DIR = os.path.join(UPLOAD_DIR, "photos")
+DOC_DIR = os.path.join(UPLOAD_DIR, "docs")
 
 os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(PHOTO_DIR, exist_ok=True)
+os.makedirs(DOC_DIR, exist_ok=True)
+
+ALLOWED_IMAGE_EXT = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
+ALLOWED_DOC_EXT = ALLOWED_IMAGE_EXT | {".pdf"}
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+FICHA_KEYS = (
+    "sexo",
+    "cpf",
+    "email",
+    "estado_civil",
+    "profissao",
+    "endereco",
+    "queixa_principal",
+    "objetivo_tratamento",
+    "diagnostico",
+    "condicoes",
+    "alergias",
+    "medicamentos",
+    "restricoes",
+    "observacoes_clinicas",
+    "foto",
+)
 
 
 def load_env_file(path):
@@ -71,6 +100,7 @@ app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
     SESSION_COOKIE_SECURE=False,
+    MAX_CONTENT_LENGTH=MAX_UPLOAD_BYTES + 1024 * 1024,
 )
 
 
@@ -193,8 +223,144 @@ def decode_json(value, default=None):
         return default
 
 
+def file_ext(filename):
+    name = (filename or "").strip().lower()
+    _, ext = os.path.splitext(name)
+    return ext
+
+
+def allowed_upload(filename, allowed):
+    return file_ext(filename) in allowed
+
+
+def read_upload(file_storage, dest_dir, allowed):
+    if not file_storage or not getattr(file_storage, "filename", None):
+        return None, "Nenhum arquivo enviado."
+    filename = secure_filename(file_storage.filename)
+    if not filename or not allowed_upload(filename, allowed):
+        return None, "Arquivo não permitido. Use PDF, JPG, PNG, WEBP ou GIF."
+    raw = file_storage.read()
+    if not raw:
+        return None, "Arquivo vazio."
+    if len(raw) > MAX_UPLOAD_BYTES:
+        return None, "Arquivo maior que 10 MB."
+    ext = file_ext(filename)
+    mime = file_storage.mimetype or "application/octet-stream"
+    stored = uuid.uuid4().hex + ext
+    os.makedirs(dest_dir, exist_ok=True)
+    path = os.path.join(dest_dir, stored)
+    with open(path, "wb") as fh:
+        fh.write(raw)
+    rel = os.path.relpath(path, UPLOAD_DIR).replace("\\", "/")
+    return {
+        "stored": stored,
+        "path": rel,
+        "original": filename,
+        "mime": mime,
+        "size": len(raw),
+        "data_url": "data:%s;base64,%s" % (mime, base64.b64encode(raw).decode("ascii")),
+    }, None
+
+
+def parse_data_url(value):
+    text = (value or "").strip()
+    if not text.startswith("data:") or ";base64," not in text:
+        return None, None
+    header, b64 = text.split(";base64,", 1)
+    mime = header[5:] or "application/octet-stream"
+    try:
+        raw = base64.b64decode(b64)
+    except (TypeError, ValueError):
+        return None, None
+    return mime, raw
+
+
+def send_stored_file(value, download_name=None):
+    mime, raw = parse_data_url(value)
+    if raw is not None:
+        from flask import Response
+        headers = {"Cache-Control": "private, max-age=3600"}
+        if download_name:
+            headers["Content-Disposition"] = "inline; filename=%s" % download_name
+        return Response(raw, mimetype=mime, headers=headers)
+    rel = (value or "").replace("\\", "/").lstrip("/")
+    if not rel or ".." in rel.split("/"):
+        return jsonify({"ok": False, "error": "Arquivo não encontrado."}), 404
+    full = os.path.abspath(os.path.join(UPLOAD_DIR, rel))
+    root = os.path.abspath(UPLOAD_DIR)
+    if not full.startswith(root + os.sep) or not os.path.isfile(full):
+        return jsonify({"ok": False, "error": "Arquivo não encontrado."}), 404
+    return send_from_directory(os.path.dirname(full), os.path.basename(full))
+
+
+def ficha_value(data, key, current=""):
+    if key not in data:
+        return (current or "").strip()
+    raw = data.get(key)
+    if raw is None:
+        return ""
+    return str(raw).strip()
+
+
+def ficha_tuple(data, current=None):
+    current = current or {}
+    return tuple(ficha_value(data, key, current.get(key) or "") for key in FICHA_KEYS if key != "foto")
+
+
+def ficha_from_row(d):
+    out = {}
+    for key in FICHA_KEYS:
+        out[key] = d.get(key) or ""
+    return out
+
+
+EXTRA_COLUMNS = [
+    ("registrations", "sexo", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "cpf", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "email", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "estado_civil", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "profissao", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "endereco", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "queixa_principal", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "objetivo_tratamento", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "diagnostico", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "condicoes", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "alergias", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "medicamentos", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "restricoes", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "observacoes_clinicas", "TEXT NOT NULL DEFAULT ''"),
+    ("registrations", "foto", "TEXT NOT NULL DEFAULT ''"),
+    ("documents", "arquivo", "TEXT NOT NULL DEFAULT ''"),
+    ("documents", "arquivo_nome", "TEXT NOT NULL DEFAULT ''"),
+    ("documents", "mime", "TEXT NOT NULL DEFAULT ''"),
+]
+
+
+def ensure_postgres_columns():
+    from db import connect_postgres
+
+    db = connect_postgres()
+    try:
+        for table, column, ddl in EXTRA_COLUMNS:
+            db.execute(
+                "ALTER TABLE " + table + " ADD COLUMN IF NOT EXISTS " + column + " " + ddl
+            )
+        db.commit()
+    except Exception:
+        try:
+            db.rollback()
+        except Exception:
+            pass
+    finally:
+        db.close()
+
+
 def init_db():
     if using_postgres():
+        try:
+            ensure_postgres_columns()
+        except Exception:
+            pass
         return
     import sqlite3
 
@@ -372,9 +538,27 @@ def init_db():
     ensure_column("services", "duracao_min", "duracao_min INTEGER NOT NULL DEFAULT 50")
     ensure_column("services", "categoria", "categoria TEXT NOT NULL DEFAULT ''")
     ensure_column("registrations", "forma_pagamento", "forma_pagamento TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "sexo", "sexo TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "cpf", "cpf TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "email", "email TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "estado_civil", "estado_civil TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "profissao", "profissao TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "endereco", "endereco TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "queixa_principal", "queixa_principal TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "objetivo_tratamento", "objetivo_tratamento TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "diagnostico", "diagnostico TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "condicoes", "condicoes TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "alergias", "alergias TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "medicamentos", "medicamentos TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "restricoes", "restricoes TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "observacoes_clinicas", "observacoes_clinicas TEXT NOT NULL DEFAULT ''")
+    ensure_column("registrations", "foto", "foto TEXT NOT NULL DEFAULT ''")
     ensure_column("payments", "method", "method TEXT NOT NULL DEFAULT ''")
     ensure_column("payments", "service_name", "service_name TEXT NOT NULL DEFAULT ''")
     ensure_column("payments", "registration_id", "registration_id INTEGER")
+    ensure_column("documents", "arquivo", "arquivo TEXT NOT NULL DEFAULT ''")
+    ensure_column("documents", "arquivo_nome", "arquivo_nome TEXT NOT NULL DEFAULT ''")
+    ensure_column("documents", "mime", "mime TEXT NOT NULL DEFAULT ''")
     db.execute(
         "UPDATE payments SET status = 'Pago' WHERE status = 'Recebido'"
     )
@@ -941,6 +1125,8 @@ def create_payment_record(db, *, patient_id, patient_name, service_id, service_n
 
 def row_to_registration(r):
     d = dict(r) if r else {}
+    ficha = ficha_from_row(d)
+    foto = ficha.get("foto") or ""
     return {
         "id": d.get("id"),
         "nome": d.get("nome"),
@@ -956,6 +1142,22 @@ def row_to_registration(r):
         "observacoes": d.get("observacoes"),
         "status": d.get("status"),
         "forma_pagamento": d.get("forma_pagamento") or "",
+        "sexo": ficha.get("sexo") or "",
+        "cpf": ficha.get("cpf") or "",
+        "email": ficha.get("email") or "",
+        "estado_civil": ficha.get("estado_civil") or "",
+        "profissao": ficha.get("profissao") or "",
+        "endereco": ficha.get("endereco") or "",
+        "queixa_principal": ficha.get("queixa_principal") or "",
+        "objetivo_tratamento": ficha.get("objetivo_tratamento") or "",
+        "diagnostico": ficha.get("diagnostico") or "",
+        "condicoes": ficha.get("condicoes") or "",
+        "alergias": ficha.get("alergias") or "",
+        "medicamentos": ficha.get("medicamentos") or "",
+        "restricoes": ficha.get("restricoes") or "",
+        "observacoes_clinicas": ficha.get("observacoes_clinicas") or "",
+        "foto": bool(foto),
+        "foto_url": ("/api/admin/cadastros/%s/foto" % d.get("id")) if foto else "",
         "criadoEm": d.get("criadoEm"),
         "atualizadoEm": d.get("atualizadoEm"),
     }
@@ -1017,14 +1219,17 @@ def api_admin_cadastro_create():
     if not service:
         return jsonify({"ok": False, "error": "Selecione um serviço."}), 400
 
+    ficha = ficha_tuple(data)
     ts = now_iso()
     cur = db.execute(
         """INSERT INTO registrations
-           (nome, nascimento, telefone, servico_id, servico, valor, dias, frequencia, motivos, observacoes, status, forma_pagamento, criadoEm, atualizadoEm)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           (nome, nascimento, telefone, servico_id, servico, valor, dias, frequencia, motivos, observacoes, status, forma_pagamento,
+            sexo, cpf, email, estado_civil, profissao, endereco, queixa_principal, objetivo_tratamento, diagnostico,
+            condicoes, alergias, medicamentos, restricoes, observacoes_clinicas, criadoEm, atualizadoEm)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (nome, nascimento, telefone, service["id"], service["nome"], service["valor"],
          json.dumps(dias, ensure_ascii=False), frequencia,
-         json.dumps(motivos, ensure_ascii=False), observacoes, status, forma_pagamento, ts, ts),
+         json.dumps(motivos, ensure_ascii=False), observacoes, status, forma_pagamento) + ficha + (ts, ts),
     )
     registration_id = cur.lastrowid
 
@@ -1130,7 +1335,7 @@ def api_admin_cadastro_prontuario(reg_id):
            ORDER BY starts_at DESC, id DESC""",
         (reg_id, nome),
     ).fetchall()]
-    docs = [dict(r) for r in db.execute(
+    docs = [row_to_document(r) for r in db.execute(
         """SELECT * FROM documents
            WHERE patient_id = ? OR (patient_id IS NULL AND LOWER(TRIM(patient_name)) = LOWER(?))
            ORDER BY id DESC""",
@@ -1168,16 +1373,20 @@ def api_admin_cadastro_update(reg_id):
     dias = data.get("dias") if data.get("dias") is not None else decode_json(row["dias"], [])
     frequencia = ((data.get("frequencia") if data.get("frequencia") is not None else row["frequencia"]) or "").strip()
     motivos = data.get("motivos") if data.get("motivos") is not None else decode_json(row["motivos"], [])
+    ficha = ficha_tuple(data, dict(row))
 
     if not nome or not telefone:
         return jsonify({"ok": False, "error": "Nome e telefone são obrigatórios."}), 400
 
     db.execute(
         """UPDATE registrations SET nome = ?, nascimento = ?, telefone = ?, dias = ?,
-           frequencia = ?, motivos = ?, observacoes = ?, status = ?, atualizadoEm = ?
+           frequencia = ?, motivos = ?, observacoes = ?, status = ?,
+           sexo = ?, cpf = ?, email = ?, estado_civil = ?, profissao = ?, endereco = ?,
+           queixa_principal = ?, objetivo_tratamento = ?, diagnostico = ?, condicoes = ?,
+           alergias = ?, medicamentos = ?, restricoes = ?, observacoes_clinicas = ?, atualizadoEm = ?
            WHERE id = ?""",
         (nome, nascimento, telefone, json.dumps(dias, ensure_ascii=False), frequencia,
-         json.dumps(motivos, ensure_ascii=False), observacoes, status, now_iso(), reg_id),
+         json.dumps(motivos, ensure_ascii=False), observacoes, status) + ficha + (now_iso(), reg_id),
     )
     db.commit()
 
@@ -1192,6 +1401,37 @@ def api_admin_cadastro_update(reg_id):
                        (status, now_iso(), wl["id"]))
         db.commit()
 
+    updated = db.execute("SELECT * FROM registrations WHERE id = ?", (reg_id,)).fetchone()
+    return jsonify({"ok": True, "data": row_to_registration(updated)})
+
+
+@app.route("/api/admin/cadastros/<int:reg_id>/foto", methods=["GET", "POST", "DELETE"])
+@login_required
+def api_admin_cadastro_foto(reg_id):
+    db = get_db()
+    row = db.execute("SELECT * FROM registrations WHERE id = ?", (reg_id,)).fetchone()
+    if not row:
+        return jsonify({"ok": False, "error": "Cadastro não encontrado."}), 404
+    if request.method == "GET":
+        foto = (row["foto"] if "foto" in row.keys() else "") or ""
+        if not foto:
+            return jsonify({"ok": False, "error": "Paciente sem foto."}), 404
+        return send_stored_file(foto, "foto-paciente.jpg")
+    if request.method == "DELETE":
+        db.execute(
+            "UPDATE registrations SET foto = ?, atualizadoEm = ? WHERE id = ?",
+            ("", now_iso(), reg_id),
+        )
+        db.commit()
+        return jsonify({"ok": True})
+    saved, err = read_upload(request.files.get("arquivo") or request.files.get("foto"), PHOTO_DIR, ALLOWED_IMAGE_EXT)
+    if err:
+        return jsonify({"ok": False, "error": err}), 400
+    db.execute(
+        "UPDATE registrations SET foto = ?, atualizadoEm = ? WHERE id = ?",
+        (saved["data_url"], now_iso(), reg_id),
+    )
+    db.commit()
     updated = db.execute("SELECT * FROM registrations WHERE id = ?", (reg_id,)).fetchone()
     return jsonify({"ok": True, "data": row_to_registration(updated)})
 
@@ -2683,31 +2923,97 @@ def api_exercises_delete(eid):
     return jsonify({"ok": True})
 
 
+def row_to_document(r):
+    d = dict(r) if r else {}
+    arquivo = d.get("arquivo") or ""
+    nome_arquivo = d.get("arquivo_nome") or ""
+    mime = d.get("mime") or ""
+    is_image = mime.startswith("image/") or file_ext(nome_arquivo) in ALLOWED_IMAGE_EXT
+    is_pdf = mime == "application/pdf" or file_ext(nome_arquivo) == ".pdf"
+    return {
+        "id": d.get("id"),
+        "patient_id": d.get("patient_id"),
+        "patient_name": d.get("patient_name") or "",
+        "titulo": d.get("titulo") or "",
+        "tipo": d.get("tipo") or "",
+        "notes": d.get("notes") or "",
+        "arquivo_nome": nome_arquivo,
+        "mime": mime,
+        "tem_arquivo": bool(arquivo),
+        "is_image": is_image,
+        "is_pdf": is_pdf,
+        "url": ("/api/admin/documents/%s/arquivo" % d.get("id")) if arquivo else "",
+        "criadoEm": d.get("criadoEm"),
+    }
+
+
 @app.route("/api/admin/documents", methods=["GET"])
 @login_required
 def api_documents_list():
-    return _list_rows("documents", "id DESC")
+    rows = get_db().execute("SELECT * FROM documents ORDER BY id DESC").fetchall()
+    return jsonify({"ok": True, "data": [row_to_document(r) for r in rows]})
 
 
 @app.route("/api/admin/documents", methods=["POST"])
 @login_required
 def api_documents_create():
     data = request.get_json(silent=True) or {}
+    if request.files:
+        data = {
+            "titulo": request.form.get("titulo") or "",
+            "patient_id": request.form.get("patient_id") or "",
+            "patient_name": request.form.get("patient_name") or "",
+            "tipo": request.form.get("tipo") or "",
+            "notes": request.form.get("notes") or "",
+        }
     titulo = (data.get("titulo") or "").strip()
+    saved = None
+    upload = request.files.get("arquivo") if request.files else None
+    if upload and upload.filename:
+        saved, err = read_upload(upload, DOC_DIR, ALLOWED_DOC_EXT)
+        if err:
+            return jsonify({"ok": False, "error": err}), 400
+        if not titulo:
+            titulo = os.path.splitext(saved["original"])[0]
     if not titulo:
-        return jsonify({"ok": False, "error": "Informe o título."}), 400
+        return jsonify({"ok": False, "error": "Informe o título ou envie um arquivo."}), 400
     patient_id, nome = resolve_patient_ref(data)
+    tipo = (data.get("tipo") or "").strip()
+    if saved and not tipo:
+        if saved["mime"].startswith("image/"):
+            tipo = "Foto / print"
+        elif saved["mime"] == "application/pdf" or file_ext(saved["original"]) == ".pdf":
+            tipo = "PDF"
+        else:
+            tipo = "Arquivo"
     db = get_db()
     ts = now_iso()
     cur = db.execute(
-        """INSERT INTO documents (patient_id, patient_name, titulo, tipo, notes, criadoEm)
-           VALUES (?, ?, ?, ?, ?, ?)""",
-        (patient_id, nome, titulo,
-         (data.get("tipo") or "").strip(), (data.get("notes") or "").strip(), ts),
+        """INSERT INTO documents
+           (patient_id, patient_name, titulo, tipo, notes, arquivo, arquivo_nome, mime, criadoEm)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (patient_id, nome, titulo, tipo, (data.get("notes") or "").strip(),
+         (saved["data_url"] if saved else ""),
+         (saved["original"] if saved else ""),
+         (saved["mime"] if saved else ""),
+         ts),
     )
     db.commit()
     row = db.execute("SELECT * FROM documents WHERE id = ?", (cur.lastrowid,)).fetchone()
-    return jsonify({"ok": True, "data": dict(row)}), 201
+    return jsonify({"ok": True, "data": row_to_document(row)}), 201
+
+
+@app.route("/api/admin/documents/<int:did>/arquivo")
+@login_required
+def api_documents_file(did):
+    row = get_db().execute("SELECT * FROM documents WHERE id = ?", (did,)).fetchone()
+    if not row:
+        return jsonify({"ok": False, "error": "Documento não encontrado."}), 404
+    arquivo = (row["arquivo"] if "arquivo" in row.keys() else "") or ""
+    if not arquivo:
+        return jsonify({"ok": False, "error": "Arquivo não encontrado."}), 404
+    nome = (row["arquivo_nome"] if "arquivo_nome" in row.keys() else "") or "documento"
+    return send_stored_file(arquivo, nome)
 
 
 @app.route("/api/admin/documents/<int:did>", methods=["DELETE"])
