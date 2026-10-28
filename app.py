@@ -2470,10 +2470,11 @@ th,td{{border-bottom:1px solid #e4e8e4;padding:8px 6px;text-align:left}}
 def api_payments_create():
     data = request.get_json(silent=True) or {}
     db = get_db()
+    patient_id, nome = resolve_patient_ref(data)
     pid = create_payment_record(
         db,
-        patient_id=data.get("patient_id"),
-        patient_name=data.get("patient_name") or "",
+        patient_id=patient_id,
+        patient_name=nome or data.get("patient_name") or "",
         service_id=data.get("service_id"),
         service_name=data.get("service_name") or data.get("servico") or "",
         amount=data.get("amount"),
@@ -2481,7 +2482,7 @@ def api_payments_create():
         status=data.get("status") or "Pendente",
         notes=data.get("notes") or "",
         appointment_id=data.get("appointment_id"),
-        registration_id=data.get("registration_id") or data.get("patient_id"),
+        registration_id=data.get("registration_id") or patient_id,
     )
     db.commit()
     if not pid:
@@ -2534,6 +2535,30 @@ def api_payments_delete(pid):
     return jsonify({"ok": True})
 
 
+def resolve_patient_ref(data):
+    db = get_db()
+    raw_id = data.get("patient_id")
+    nome = (data.get("patient_name") or "").strip()
+    try:
+        pid = int(raw_id) if raw_id not in (None, "") else None
+    except (TypeError, ValueError):
+        pid = None
+    if pid:
+        row = db.execute("SELECT id, nome FROM registrations WHERE id = ?", (pid,)).fetchone()
+        if row:
+            return row["id"], row["nome"]
+    if nome:
+        row = db.execute(
+            """SELECT id, nome FROM registrations
+               WHERE LOWER(TRIM(nome)) = LOWER(?)
+               ORDER BY id DESC LIMIT 1""",
+            (nome,),
+        ).fetchone()
+        if row:
+            return row["id"], row["nome"]
+    return None, nome
+
+
 @app.route("/api/admin/evaluations", methods=["GET"])
 @login_required
 def api_evaluations_list():
@@ -2544,7 +2569,7 @@ def api_evaluations_list():
 @login_required
 def api_evaluations_create():
     data = request.get_json(silent=True) or {}
-    nome = (data.get("patient_name") or "").strip()
+    patient_id, nome = resolve_patient_ref(data)
     if not nome:
         return jsonify({"ok": False, "error": "Informe o paciente."}), 400
     db = get_db()
@@ -2554,7 +2579,7 @@ def api_evaluations_create():
            (patient_id, patient_name, evaluated_at, queixa, objetivos, historico,
             avaliacao_funcional, plano, observacoes, profissional, criadoEm, atualizadoEm)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (data.get("patient_id"), nome, data.get("evaluated_at") or ts[:10],
+        (patient_id, nome, data.get("evaluated_at") or ts[:10],
          (data.get("queixa") or "").strip(), (data.get("objetivos") or "").strip(),
          (data.get("historico") or "").strip(), (data.get("avaliacao_funcional") or "").strip(),
          (data.get("plano") or "").strip(), (data.get("observacoes") or "").strip(),
@@ -2586,7 +2611,7 @@ def api_evolutions_list():
 @login_required
 def api_evolutions_create():
     data = request.get_json(silent=True) or {}
-    nome = (data.get("patient_name") or "").strip()
+    patient_id, nome = resolve_patient_ref(data)
     if not nome:
         return jsonify({"ok": False, "error": "Informe o paciente."}), 400
     db = get_db()
@@ -2596,7 +2621,7 @@ def api_evolutions_create():
            (patient_id, patient_name, appointment_id, evolution_date, procedimentos, exercicios,
             resposta, observacoes, proxima_conduta, profissional, criadoEm, atualizadoEm)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (data.get("patient_id"), nome, data.get("appointment_id"),
+        (patient_id, nome, data.get("appointment_id"),
          data.get("evolution_date") or ts[:10],
          (data.get("procedimentos") or "").strip(), (data.get("exercicios") or "").strip(),
          (data.get("resposta") or "").strip(), (data.get("observacoes") or "").strip(),
@@ -2671,12 +2696,13 @@ def api_documents_create():
     titulo = (data.get("titulo") or "").strip()
     if not titulo:
         return jsonify({"ok": False, "error": "Informe o título."}), 400
+    patient_id, nome = resolve_patient_ref(data)
     db = get_db()
     ts = now_iso()
     cur = db.execute(
         """INSERT INTO documents (patient_id, patient_name, titulo, tipo, notes, criadoEm)
            VALUES (?, ?, ?, ?, ?, ?)""",
-        (data.get("patient_id"), (data.get("patient_name") or "").strip(), titulo,
+        (patient_id, nome, titulo,
          (data.get("tipo") or "").strip(), (data.get("notes") or "").strip(), ts),
     )
     db.commit()

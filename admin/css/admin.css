@@ -1154,6 +1154,16 @@
   font-size: 0.86rem;
   color: var(--muted-foreground);
 }
+.prontuario-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+.prontuario-item__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
 .dupla-confirm,
 .dupla-detail {
   display: flex;
@@ -1226,6 +1236,11 @@
 .modal.is-open {
   opacity: 1;
   visibility: visible;
+}
+#modalRecord,
+#modalConfirm,
+#modalAppointment {
+  z-index: 70;
 }
 .modal__backdrop {
   position: absolute;

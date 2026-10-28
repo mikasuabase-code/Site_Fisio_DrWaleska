@@ -785,6 +785,126 @@
     return '<div class="prontuario-list">' + rows.map(render).join("") + "</div>";
   }
 
+  function prontuarioAction(label, kind) {
+    return (
+      '<div class="prontuario-toolbar">' +
+      '<button class="btn btn--primary btn--sm" type="button" data-prontuario-new="' +
+      kind +
+      '">' +
+      escapeHtml(label) +
+      "</button></div>"
+    );
+  }
+
+  function recarregarProntuario(keepTab) {
+    var p = (state.prontuario && state.prontuario.paciente) || {};
+    if (!p.id) return Promise.resolve();
+    var tab = keepTab || (state.prontuario && state.prontuario.tab) || "dados";
+    return api("GET", "/api/admin/cadastros/" + p.id + "/prontuario").then(function (res) {
+      state.prontuario = res.data || state.prontuario;
+      state.prontuario.tab = tab;
+      renderProntuarioTab(tab);
+    });
+  }
+
+  function bindProntuarioActions(root) {
+    if (!root) return;
+    root.querySelectorAll("[data-prontuario-new]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        abrirRegistroProntuario(btn.getAttribute("data-prontuario-new"));
+      });
+    });
+    root.querySelectorAll("[data-prontuario-del]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var kind = btn.getAttribute("data-prontuario-del");
+        var id = btn.getAttribute("data-id");
+        var urls = {
+          eval: "/api/admin/evaluations/",
+          evo: "/api/admin/evolutions/",
+          doc: "/api/admin/documents/"
+        };
+        if (!urls[kind] || !id) return;
+        confirmar("Excluir registro", "Esta ação não pode ser desfeita.", function () {
+          api("DELETE", urls[kind] + id)
+            .then(function () {
+              toast("Registro excluído.");
+              recarregarProntuario();
+            })
+            .catch(function (err) {
+              toast(err.message, true);
+            });
+        });
+      });
+    });
+    root.querySelectorAll("[data-prontuario-apt]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        abrirAgendamento(Number(btn.getAttribute("data-prontuario-apt")));
+      });
+    });
+  }
+
+  function abrirRegistroProntuario(kind) {
+    var p = (state.prontuario && state.prontuario.paciente) || {};
+    var nome = p.nome || "";
+    var hoje = ymd(new Date());
+    if (kind === "eval") {
+      openRecord(
+        "eval",
+        "Nova avaliação",
+        fieldHtml("rNome", "Paciente", "text", 'value="' + escapeHtml(nome) + '" readonly') +
+          fieldHtml("rData", "Data", "date", 'value="' + hoje + '"') +
+          fieldHtml("rQueixa", "Queixa principal", "textarea") +
+          fieldHtml("rObj", "Objetivos", "textarea") +
+          fieldHtml("rHist", "Histórico", "textarea") +
+          fieldHtml("rFunc", "Avaliação funcional", "textarea") +
+          fieldHtml("rPlano", "Plano terapêutico", "textarea")
+      );
+    } else if (kind === "evo") {
+      openRecord(
+        "evo",
+        "Nova evolução",
+        fieldHtml("rNome", "Paciente", "text", 'value="' + escapeHtml(nome) + '" readonly') +
+          fieldHtml("rData", "Data", "date", 'value="' + hoje + '"') +
+          fieldHtml("rProc", "Procedimentos", "textarea") +
+          fieldHtml("rEx", "Exercícios", "textarea") +
+          fieldHtml("rResp", "Resposta do paciente", "textarea") +
+          fieldHtml("rCond", "Próxima conduta", "textarea")
+      );
+    } else if (kind === "doc") {
+      openRecord(
+        "doc",
+        "Novo documento",
+        fieldHtml("rTitulo", "Título") +
+          fieldHtml("rNome", "Paciente", "text", 'value="' + escapeHtml(nome) + '" readonly') +
+          fieldHtml("rTipo", "Tipo") +
+          fieldHtml("rNotes", "Observações", "textarea")
+      );
+    } else if (kind === "pay") {
+      openRecord(
+        "pay",
+        "Registrar pagamento",
+        fieldHtml("rNome", "Paciente", "text", 'value="' + escapeHtml(nome) + '" readonly') +
+          fieldHtml("rServico", "Serviço", "text", p.servico ? 'value="' + escapeHtml(p.servico) + '"' : "") +
+          fieldHtml("rVal", "Valor (R$)", "number", p.valor != null ? 'value="' + p.valor + '"' : "") +
+          '<div class="field"><label class="field__label" for="rMethod">Forma de pagamento</label><select class="input" id="rMethod"><option>Pix</option><option>Dinheiro</option></select></div>' +
+          '<div class="field"><label class="field__label" for="rStatus">Status</label><select class="input" id="rStatus"><option>Pendente</option><option>Pago</option><option>Cancelado</option></select></div>' +
+          fieldHtml("rNotes", "Observações", "textarea")
+      );
+      if ($("rMethod") && p.forma_pagamento) $("rMethod").value = p.forma_pagamento;
+    } else if (kind === "agenda") {
+      fecharModal("modalRegDetail");
+      withServices(function () {
+        abrirNovoAgendamento();
+        if ($("aptPatientSearch")) $("aptPatientSearch").value = nome;
+        if ($("aptPatientId") && p.id) $("aptPatientId").value = String(p.id);
+        if ($("aptPatientPicked")) $("aptPatientPicked").textContent = nome ? "Paciente: " + nome : "";
+        if ($("aptService") && p.servico_id) $("aptService").value = String(p.servico_id);
+      });
+      return;
+    }
+    recordPatientId = p.id || null;
+  }
+
   function renderProntuarioTab(tab) {
     var p = (state.prontuario && state.prontuario.paciente) || {};
     var body = $("regDetailBody");
@@ -808,90 +928,157 @@
     }
     if (tab === "avaliacao") {
       var evals = (state.prontuario && state.prontuario.avaliacoes) || [];
-      body.innerHTML = evals.length
-        ? prontuarioItems(evals, function (e) {
-            return (
-              '<article class="prontuario-item"><strong>' + escapeHtml(fmtData(e.evaluated_at)) +
-              (e.profissional ? " · " + escapeHtml(e.profissional) : "") +
-              "</strong><p>Queixa: " + escapeHtml(e.queixa || "—") +
-              "</p><p>Objetivos: " + escapeHtml(e.objetivos || "—") +
-              "</p><p>Plano: " + escapeHtml(e.plano || "—") + "</p></article>"
-            );
-          })
-        : prontuarioEmpty("Nenhuma avaliação registrada.");
+      body.innerHTML =
+        prontuarioAction("Nova avaliação", "eval") +
+        (evals.length
+          ? prontuarioItems(evals, function (e) {
+              return (
+                '<article class="prontuario-item"><strong>' +
+                escapeHtml(fmtData(e.evaluated_at)) +
+                (e.profissional ? " · " + escapeHtml(e.profissional) : "") +
+                "</strong><p>Queixa: " +
+                escapeHtml(e.queixa || "—") +
+                "</p><p>Histórico: " +
+                escapeHtml(e.historico || "—") +
+                "</p><p>Avaliação funcional: " +
+                escapeHtml(e.avaliacao_funcional || "—") +
+                "</p><p>Objetivos: " +
+                escapeHtml(e.objetivos || "—") +
+                "</p><p>Plano: " +
+                escapeHtml(e.plano || "—") +
+                "</p><p>Observações: " +
+                escapeHtml(e.observacoes || "—") +
+                '</p><div class="prontuario-item__actions"><button class="btn btn--danger btn--sm" type="button" data-prontuario-del="eval" data-id="' +
+                e.id +
+                '">Excluir</button></div></article>'
+              );
+            })
+          : prontuarioEmpty("Nenhuma avaliação registrada."));
+      bindProntuarioActions(body);
       return;
     }
     if (tab === "evolucoes") {
       var evos = (state.prontuario && state.prontuario.evolucoes) || [];
-      body.innerHTML = evos.length
-        ? prontuarioItems(evos, function (e) {
-            return (
-              '<article class="prontuario-item"><strong>' + escapeHtml(fmtData(e.evolution_date)) +
-              (e.profissional ? " · " + escapeHtml(e.profissional) : "") +
-              "</strong><p>Procedimentos: " + escapeHtml(e.procedimentos || "—") +
-              "</p><p>Exercícios: " + escapeHtml(e.exercicios || "—") +
-              "</p><p>Resposta: " + escapeHtml(e.resposta || "—") +
-              "</p><p>Próxima conduta: " + escapeHtml(e.proxima_conduta || "—") + "</p></article>"
-            );
-          })
-        : prontuarioEmpty("Nenhuma evolução registrada.");
+      body.innerHTML =
+        prontuarioAction("Nova evolução", "evo") +
+        (evos.length
+          ? prontuarioItems(evos, function (e) {
+              return (
+                '<article class="prontuario-item"><strong>' +
+                escapeHtml(fmtData(e.evolution_date)) +
+                (e.profissional ? " · " + escapeHtml(e.profissional) : "") +
+                "</strong><p>Procedimentos: " +
+                escapeHtml(e.procedimentos || "—") +
+                "</p><p>Exercícios: " +
+                escapeHtml(e.exercicios || "—") +
+                "</p><p>Resposta: " +
+                escapeHtml(e.resposta || "—") +
+                "</p><p>Próxima conduta: " +
+                escapeHtml(e.proxima_conduta || "—") +
+                "</p><p>Observações: " +
+                escapeHtml(e.observacoes || "—") +
+                '</p><div class="prontuario-item__actions"><button class="btn btn--danger btn--sm" type="button" data-prontuario-del="evo" data-id="' +
+                e.id +
+                '">Excluir</button></div></article>'
+              );
+            })
+          : prontuarioEmpty("Nenhuma evolução registrada."));
+      bindProntuarioActions(body);
       return;
     }
     if (tab === "agenda") {
       var agenda = (state.prontuario && state.prontuario.agenda) || [];
-      body.innerHTML = agenda.length
-        ? prontuarioItems(agenda, function (a) {
-            return (
-              '<article class="prontuario-item"><strong>' +
-              escapeHtml(fmtData(a.starts_at)) + " " + escapeHtml(String(a.starts_at || "").slice(11, 16)) +
-              "</strong><p>" + escapeHtml(a.service_name || "—") + " · " + pill(a.status) + "</p></article>"
-            );
-          })
-        : prontuarioEmpty("Nenhum agendamento vinculado.");
+      body.innerHTML =
+        prontuarioAction("Novo agendamento", "agenda") +
+        (agenda.length
+          ? prontuarioItems(agenda, function (a) {
+              return (
+                '<article class="prontuario-item"><strong>' +
+                escapeHtml(fmtData(a.starts_at)) +
+                " " +
+                escapeHtml(String(a.starts_at || "").slice(11, 16)) +
+                '</strong><p>' +
+                escapeHtml(a.service_name || "—") +
+                " · " +
+                pill(a.status) +
+                '</p><div class="prontuario-item__actions"><button class="btn btn--outline btn--sm" type="button" data-prontuario-apt="' +
+                a.id +
+                '">Abrir</button></div></article>'
+              );
+            })
+          : prontuarioEmpty("Nenhum agendamento vinculado."));
+      bindProntuarioActions(body);
       return;
     }
     if (tab === "financeiro") {
       var pays = (state.prontuario && state.prontuario.financeiro) || [];
       var resumo = (state.prontuario && state.prontuario.resumo_financeiro) || {};
       body.innerHTML =
+        prontuarioAction("Registrar pagamento", "pay") +
         linhaDetalhe("Recebido", moeda(resumo.recebido)) +
         linhaDetalhe("Pendente", moeda(resumo.pendente)) +
         (pays.length
           ? prontuarioItems(pays, function (pay) {
               return (
                 '<article class="prontuario-item"><strong>' +
-                escapeHtml(fmtData(pay.criadoEm)) + " · " + moeda(pay.amount) +
-                "</strong><p>" + escapeHtml(pay.service_name || "—") + " · " +
-                escapeHtml(pay.method || "—") + " · " + pill(pay.status) + "</p></article>"
+                escapeHtml(fmtData(pay.criadoEm)) +
+                " · " +
+                moeda(pay.amount) +
+                "</strong><p>" +
+                escapeHtml(pay.service_name || "—") +
+                " · " +
+                escapeHtml(pay.method || "—") +
+                " · " +
+                pill(pay.status) +
+                "</p></article>"
               );
             })
           : prontuarioEmpty("Nenhum lançamento financeiro."));
+      bindProntuarioActions(body);
       return;
     }
     if (tab === "documentos") {
       var docs = (state.prontuario && state.prontuario.documentos) || [];
-      body.innerHTML = docs.length
-        ? prontuarioItems(docs, function (d) {
-            return (
-              '<article class="prontuario-item"><strong>' + escapeHtml(d.titulo) +
-              "</strong><p>" + escapeHtml(d.tipo || "Documento") + " · " + escapeHtml(fmtData(d.criadoEm)) + "</p></article>"
-            );
-          })
-        : prontuarioEmpty("Nenhum documento registrado.");
+      body.innerHTML =
+        prontuarioAction("Novo documento", "doc") +
+        (docs.length
+          ? prontuarioItems(docs, function (d) {
+              return (
+                '<article class="prontuario-item"><strong>' +
+                escapeHtml(d.titulo) +
+                "</strong><p>" +
+                escapeHtml(d.tipo || "Documento") +
+                " · " +
+                escapeHtml(fmtData(d.criadoEm)) +
+                "</p><p>" +
+                escapeHtml(d.notes || "") +
+                '</p><div class="prontuario-item__actions"><button class="btn btn--danger btn--sm" type="button" data-prontuario-del="doc" data-id="' +
+                d.id +
+                '">Excluir</button></div></article>'
+              );
+            })
+          : prontuarioEmpty("Nenhum documento registrado."));
+      bindProntuarioActions(body);
       return;
     }
     if (tab === "exercicios") {
       var evoEx = ((state.prontuario && state.prontuario.evolucoes) || []).filter(function (e) {
         return (e.exercicios || "").trim();
       });
-      body.innerHTML = evoEx.length
-        ? prontuarioItems(evoEx, function (e) {
-            return (
-              '<article class="prontuario-item"><strong>' + escapeHtml(fmtData(e.evolution_date)) +
-              "</strong><p>" + escapeHtml(e.exercicios) + "</p></article>"
-            );
-          })
-        : prontuarioEmpty("Nenhum exercício vinculado a este paciente.");
+      body.innerHTML =
+        prontuarioAction("Registrar exercícios na evolução", "evo") +
+        (evoEx.length
+          ? prontuarioItems(evoEx, function (e) {
+              return (
+                '<article class="prontuario-item"><strong>' +
+                escapeHtml(fmtData(e.evolution_date)) +
+                "</strong><p>" +
+                escapeHtml(e.exercicios) +
+                "</p></article>"
+              );
+            })
+          : prontuarioEmpty("Nenhum exercício vinculado a este paciente."));
+      bindProntuarioActions(body);
       return;
     }
     var hist = [];
@@ -903,6 +1090,12 @@
     });
     ((state.prontuario && state.prontuario.agenda) || []).forEach(function (a) {
       hist.push({ data: a.starts_at, texto: "Agenda: " + (a.service_name || "atendimento") + " · " + (a.status || "") });
+    });
+    ((state.prontuario && state.prontuario.documentos) || []).forEach(function (d) {
+      hist.push({ data: d.criadoEm, texto: "Documento: " + (d.titulo || "registro") });
+    });
+    ((state.prontuario && state.prontuario.financeiro) || []).forEach(function (pay) {
+      hist.push({ data: pay.criadoEm, texto: "Financeiro: " + (pay.service_name || "lançamento") + " · " + (pay.status || "") });
     });
     hist.sort(function (a, b) { return String(b.data || "").localeCompare(String(a.data || "")); });
     body.innerHTML = hist.length
@@ -2269,6 +2462,7 @@
   });
 
   var recordKind = "";
+  var recordPatientId = null;
 
   function fieldHtml(id, label, type, extra) {
     extra = extra || "";
@@ -2280,6 +2474,7 @@
 
   function openRecord(kind, title, html) {
     recordKind = kind;
+    recordPatientId = null;
     $("recordTitle").textContent = title;
     $("recordFields").innerHTML = html;
     $("recordStatus").textContent = "";
@@ -2573,25 +2768,28 @@
       var url = "";
       if (recordKind === "eval") {
         url = "/api/admin/evaluations";
-        payload = { patient_name: $("rNome").value, evaluated_at: $("rData").value, queixa: $("rQueixa").value, objetivos: $("rObj").value, historico: $("rHist").value, avaliacao_funcional: $("rFunc").value, plano: $("rPlano").value };
+        payload = { patient_id: recordPatientId, patient_name: $("rNome").value, evaluated_at: $("rData").value, queixa: $("rQueixa").value, objetivos: $("rObj").value, historico: $("rHist").value, avaliacao_funcional: $("rFunc").value, plano: $("rPlano").value };
       } else if (recordKind === "evo") {
         url = "/api/admin/evolutions";
-        payload = { patient_name: $("rNome").value, evolution_date: $("rData").value, procedimentos: $("rProc").value, exercicios: $("rEx").value, resposta: $("rResp").value, proxima_conduta: $("rCond").value };
+        payload = { patient_id: recordPatientId, patient_name: $("rNome").value, evolution_date: $("rData").value, procedimentos: $("rProc").value, exercicios: $("rEx").value, resposta: $("rResp").value, proxima_conduta: $("rCond").value };
       } else if (recordKind === "ex") {
         url = "/api/admin/exercises";
         payload = { nome: $("rNome").value, categoria: $("rCat").value, regiao: $("rReg").value, objetivo: $("rObj").value, descricao: $("rDesc").value, instrucoes: $("rInst").value };
       } else if (recordKind === "pay") {
         url = "/api/admin/payments";
-        payload = { patient_name: $("rNome").value, service_name: $("rServico") ? $("rServico").value : "", amount: $("rVal").value, method: $("rMethod") ? $("rMethod").value : "", status: $("rStatus").value, notes: $("rNotes").value };
+        payload = { patient_id: recordPatientId, patient_name: $("rNome").value, service_name: $("rServico") ? $("rServico").value : "", amount: $("rVal").value, method: $("rMethod") ? $("rMethod").value : "", status: $("rStatus").value, notes: $("rNotes").value };
       } else if (recordKind === "doc") {
         url = "/api/admin/documents";
-        payload = { titulo: $("rTitulo").value, patient_name: $("rNome").value, tipo: $("rTipo").value, notes: $("rNotes").value };
+        payload = { patient_id: recordPatientId, titulo: $("rTitulo").value, patient_name: $("rNome").value, tipo: $("rTipo").value, notes: $("rNotes").value };
       }
       api("POST", url, payload)
         .then(function () {
           fecharModal("modalRecord");
           toast("Registro salvo.");
           aplicarView(state.view);
+          if (recordPatientId && $("modalRegDetail") && $("modalRegDetail").classList.contains("is-open")) {
+            recarregarProntuario();
+          }
         })
         .catch(function (err) {
           $("recordStatus").textContent = err.message;
